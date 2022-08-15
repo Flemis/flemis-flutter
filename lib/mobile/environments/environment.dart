@@ -1,0 +1,3 @@
+class Environment {
+  String? url;
+}
