@@ -555,27 +555,7 @@ class _CameraScreenState extends State<CameraScreen>
                 child: _cameraWidget(screenSize),
               ),
             );
-          }
-          /* : Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        SizedBox(
-                          height: 100,
-                          width: 100,
-                          child: LoadingIndicator(
-                            indicatorType: Indicator.ballClipRotateMultiple,
-                            colors: [secondaryColor],
-                          ),
-                        ),
-                        Text(
-                          'Loading Camera, please wait',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ],
-                    ),
-                  ) */
-          else {
+          } else {
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -590,7 +570,6 @@ class _CameraScreenState extends State<CameraScreen>
                     // await openAppSettings()
                     //     .then((value) async => await getPermissionStatus());
                     await getPermissionStatus();
-                    //_initCamera();
                   },
                   child: const Padding(
                     padding: EdgeInsets.all(8.0),
@@ -614,7 +593,7 @@ class _CameraScreenState extends State<CameraScreen>
   Widget _cameraWidget(Size screenSize) {
     return ValueListenableBuilder<CameraType>(
         valueListenable: selectType,
-        builder: (context, type, _) {
+        builder: (context, selectedValue, _) {
           return Stack(
             alignment: Alignment.bottomCenter,
             fit: StackFit.expand,
@@ -630,14 +609,6 @@ class _CameraScreenState extends State<CameraScreen>
                   );
                 }),
               ),
-              // Center(
-              //   child: Image.asset(
-              //     'assets/camera_aim.png',
-              //     color: Colors.greenAccent,
-              //     width: 150,
-              //     height: 150,
-              //   ),
-              // ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(
                   16.0,
@@ -648,66 +619,6 @@ class _CameraScreenState extends State<CameraScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    /* Align(
-                                      alignment: Alignment.topRight,
-                                      child: Container(
-                                        height: MediaQuery.of(context).size.height *
-                                            0.2,
-                                        width: MediaQuery.of(context).size.height *
-                                            0.05,
-                                        decoration: BoxDecoration(
-                                          color: Colors.black87,
-                                          borderRadius: BorderRadius.circular(10.0),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(
-                                            left: 4.0,
-                                            right: 8.0,
-                                          ),
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              IconButton(
-                                                  icon: Icon(
-                                                    _currentFlashModeIcon(
-                                                        _currentFlashMode!),
-                                                    color: whiteColor,
-                                                  ),
-                                                  onPressed: () async {
-                                                    if (_currentFlashMode ==
-                                                        FlashMode.off) {
-                                                      setState(() {
-                                                        _currentFlashMode =
-                                                            FlashMode.auto;
-                                                      });
-                                                      await controller
-                                                          ?.setFlashMode(
-                                                              FlashMode.auto);
-                                                    } else if (_currentFlashMode ==
-                                                        FlashMode.auto) {
-                                                      setState(() {
-                                                        _currentFlashMode =
-                                                            FlashMode.torch;
-                                                      });
-                                                      await controller
-                                                          ?.setFlashMode(
-                                                              FlashMode.torch);
-                                                    } else {
-                                                      setState(() {
-                                                        _currentFlashMode =
-                                                            FlashMode.off;
-                                                      });
-                                                      await controller
-                                                          ?.setFlashMode(
-                                                              FlashMode.off);
-                                                    }
-                                                  }),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ), */
                     const Spacer(),
                     Row(
                       children: [
