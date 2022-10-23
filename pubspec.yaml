@@ -37,7 +37,6 @@ dependencies:
   firebase_analytics: ^10.0.2
   firebase_core: ^2.1.0
   firebase_crashlytics: ^3.0.2
-  flex_color_scheme: ^6.0.1
   flutter:
     sdk: flutter
   flutter_masked_text2: ^0.9.1
