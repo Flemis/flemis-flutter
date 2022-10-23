@@ -1,8 +1,13 @@
+import 'package:device_preview/device_preview.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flemis/mobile/providers/manager.dart';
 import 'package:flemis/mobile/ui/screens/Base/mobile_base.dart';
 import 'package:flemis/mobile/ui/screens/home/mobile_home.dart';
 import 'package:flemis/mobile/ui/screens/login/mobile_login_screen.dart';
+import 'package:flemis/mobile/ui/screens/profile/edit/mobile_edit_profile_screen.dart';
+import 'package:flemis/mobile/ui/screens/profile/profile_screen.dart';
 import 'package:flemis/mobile/ui/screens/register/mobile_register.dart';
+import 'package:flemis/mobile/ui/screens/splash/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -29,7 +34,7 @@ final ThemeData defaultTheme = ThemeData(
   colorScheme: schemeDefault,
   bottomAppBarColor: schemeDefault.primary,
   primaryTextTheme: GoogleFonts.mochiyPopOneTextTheme(
-    TextTheme(
+    const TextTheme(
       headline2: TextStyle(
         color: secondaryColor,
         fontSize: 50,
@@ -61,7 +66,7 @@ final ThemeData defaultTheme = ThemeData(
     ),
   ),
   textTheme: GoogleFonts.interTextTheme(
-    TextTheme(
+    const TextTheme(
       headline1: TextStyle(
         color: tertiaryColor,
         fontSize: 20,
@@ -88,7 +93,7 @@ final ThemeData defaultTheme = ThemeData(
 );
 final darkTheme = ThemeData(
   primaryTextTheme: GoogleFonts.mochiyPopOneTextTheme(
-    TextTheme(
+    const TextTheme(
       headlineLarge: TextStyle(
         color: secondaryColor,
         fontSize: 50,
@@ -138,6 +143,10 @@ List<TextStyle> primaryFontStyle = <TextStyle>[
       color: whiteColor,
       fontSize: 15,
       fontFamily: GoogleFonts.mochiyPopOne().fontFamily),
+  TextStyle(
+      color: secondaryColor,
+      fontSize: 13,
+      fontFamily: GoogleFonts.mochiyPopOne().fontFamily),
 ];
 
 List<TextStyle> secondaryFontStyle = <TextStyle>[
@@ -158,6 +167,18 @@ List<TextStyle> secondaryFontStyle = <TextStyle>[
       fontFamily: GoogleFonts.inter().fontFamily),
   TextStyle(
     color: whiteColor,
+    fontSize: 15,
+    fontWeight: FontWeight.normal,
+    fontFamily: GoogleFonts.inter().fontFamily,
+  ),
+  TextStyle(
+    color: whiteColor,
+    fontSize: 12,
+    fontWeight: FontWeight.normal,
+    fontFamily: GoogleFonts.inter().fontFamily,
+  ),
+  TextStyle(
+    color: primaryColor,
     fontSize: 12,
     fontWeight: FontWeight.normal,
     fontFamily: GoogleFonts.inter().fontFamily,
@@ -168,6 +189,17 @@ List<TextStyle> secondaryFontStyle = <TextStyle>[
     fontWeight: FontWeight.normal,
     fontFamily: GoogleFonts.inter().fontFamily,
   ),
+  TextStyle(
+    color: tertiaryColor,
+    fontSize: 15,
+    fontWeight: FontWeight.normal,
+    fontFamily: GoogleFonts.inter().fontFamily,
+  ),
+  TextStyle(
+      color: whiteColor,
+      fontSize: 20,
+      fontWeight: FontWeight.bold,
+      fontFamily: GoogleFonts.inter().fontFamily),
 ];
 
 class MyApp extends StatefulWidget {
@@ -179,6 +211,9 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   bool isDarkTheme = false;
+  static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+  static FirebaseAnalyticsObserver observer =
+      FirebaseAnalyticsObserver(analytics: analytics);
 
   @override
   Widget build(BuildContext context) {
@@ -192,10 +227,31 @@ class _MyAppState extends State<MyApp> {
         value: SystemUiOverlayStyle(
           systemNavigationBarColor: !isDarkTheme ? primaryColor : darkColor,
         ),
-        child: const MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'Flutter Demo',
-          home: MobileBase(),
+        child: DevicePreview(
+          //enabled: !kReleaseMode,
+          enabled: false,
+          builder: (context) => MaterialApp(
+            debugShowCheckedModeBanner: false,
+            useInheritedMediaQuery: true,
+            builder: (context, child) =>
+                DevicePreview.appBuilder(context, child),
+            title: 'Flemis',
+            darkTheme: ThemeData.dark(),
+            //home: const MobileLoginScreen(),
+            initialRoute: "/splash",
+            navigatorObservers: [
+              observer,
+            ],
+            routes: {
+              "/splash": (context) => const SplashScreen(),
+              "/base": (context) => const MobileBase(),
+              "/home": (context) => const MobileHome(),
+              "/login": (context) => const MobileLoginScreen(),
+              "/register": (context) => const MobileRegister(),
+              "/edit": (context) => const MobileEditProfileScreen(),
+              "/profile": (context) => const ProfileScreen(),
+            },
+          ),
         ),
       ),
     );

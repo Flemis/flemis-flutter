@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "201376969510",
+    "project_id": "flemis-80738",
+    "storage_bucket": "flemis-80738.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:201376969510:android:e37c33230fffb1a23c07e7",
+        "android_client_info": {
+          "package_name": "com.fernandosini.flemis"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "201376969510-udkpce0vf2f618q9dmgjt5bcgl28bq3d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAQf1bqw2knMy8eV7ZkucnT_1l8aZNeyc0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "201376969510-udkpce0vf2f618q9dmgjt5bcgl28bq3d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

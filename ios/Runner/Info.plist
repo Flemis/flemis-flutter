@@ -47,5 +47,15 @@
 		<true />
 		<key>com.apple.security.network.client</key>
 		<true />
+		<key>NSCameraUsageDescription</key>
+		<string>Flemis needs access your camera</string>
+		<key>NSMicrophoneUsageDescription</key>
+		<string>Flemis needs access your microphone</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>Flemis need to access your storage to save photots</string>
+		<key>NSBonjourServices</key>
+		<array>
+			<string>_dartobservatory._tcp</string>
+		</array>
 	</dict>
 </plist>

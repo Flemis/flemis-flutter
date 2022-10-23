@@ -192,10 +192,12 @@ class DefaultService {
 
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:flemis/mobile/repository/user_repository.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 
 import '../environments/staging_environment.dart';
+import '../models/api_response.dart';
 
 class DefaultService {
   //UserRepository userRepository = UserRepository();
@@ -205,12 +207,13 @@ class DefaultService {
   static String? envUrl = environment.url;
 
   Future<String?> getToken() async {
-    //var user = await userRepository.read();
+    UserRepository userRepository = UserRepository();
+    var user = await userRepository.read();
     /* var token = (user != null && user.token != null)
         ? user.token['access_token']
         : null;*/
-    var user;
-    var token;
+    //var user;
+    String? token;
     if (user != null && user.token != null) {
       token = user.token;
     } else {
@@ -237,6 +240,7 @@ class DefaultService {
     final response = await http.Response.fromStream(await request.send());
     return response;
   }
+  
 
   Future<Response> delete(String url, {Map<dynamic, dynamic>? body}) async {
     var token = await getToken();
@@ -311,14 +315,14 @@ class DefaultService {
     return utf8.decode(bodyBytes);
   }
 
-  /* APIResponse parseResponse<T>(Response response) {
+  APIResponse parseResponse<T>(Response response) {
     final decoded = decodeToJsonString(response.bodyBytes);
-    return APIResponse<T>.fromJson(json.decode(decoded));
+    return APIResponse<T>.fromJson(json.decode(decoded), response.statusCode);
   }
 
   APIResponse parseUserResponse<T>(Response response) {
     final decoded = decodeToJsonString(response.bodyBytes);
-    return APIResponse<T>.userFromJson(json.decode(decoded));
-  } */
-
+    return APIResponse<T>.userFromJson(json.decode(decoded),
+        status: response.statusCode);
+  }
 }
