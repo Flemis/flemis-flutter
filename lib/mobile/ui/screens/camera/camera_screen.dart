@@ -591,25 +591,25 @@ class _CameraScreenState extends State<CameraScreen>
   }
 
   Widget _cameraWidget(Size screenSize) {
-    return ValueListenableBuilder<CameraType>(
-        valueListenable: selectType,
-        builder: (context, selectedValue, _) {
-          return Stack(
-            alignment: Alignment.bottomCenter,
-            fit: StackFit.expand,
-            children: [
-              CameraPreview(
-                controller,
-                child: LayoutBuilder(builder:
-                    (BuildContext context, BoxConstraints constraints) {
-                  return GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTapDown: (details) async =>
-                        await onViewFinderTap(details, constraints),
-                  );
-                }),
-              ),
-              Padding(
+    return Stack(
+      alignment: Alignment.bottomCenter,
+      fit: StackFit.expand,
+      children: [
+        CameraPreview(
+          controller,
+          child: LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints constraints) {
+            return GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTapDown: (details) async =>
+                  await onViewFinderTap(details, constraints),
+            );
+          }),
+        ),
+        ValueListenableBuilder<CameraType>(
+            valueListenable: selectType,
+            builder: (context, selectedValue, _) {
+              return Padding(
                 padding: const EdgeInsets.fromLTRB(
                   16.0,
                   8.0,
@@ -837,10 +837,10 @@ class _CameraScreenState extends State<CameraScreen>
                     ),
                   ],
                 ),
-              ),
-            ],
-          );
-        });
+              );
+            }),
+      ],
+    );
   }
 
   Widget _chooseMenu(Size screenSize, List<CameraType> menu,

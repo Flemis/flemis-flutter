@@ -32,7 +32,7 @@ class _MobileHomeState extends State<MobileHome> {
   void initState() {
     super.initState();
     controller = PostController(context: context);
-    manager = context.read<Manager>();
+    manager = context.read<Manager>();  
   }
 
   @override
