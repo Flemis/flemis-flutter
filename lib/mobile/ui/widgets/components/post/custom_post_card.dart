@@ -2,9 +2,6 @@ import 'dart:io';
 
 import 'package:flemis/mobile/my_app_mobile.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:fluttericon/font_awesome5_icons.dart';
 import 'package:fluttericon/font_awesome_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -20,7 +17,9 @@ class _CustomPostCardState extends State<CustomPostCard> {
   Widget build(BuildContext context) {
     var screenSize = MediaQuery.of(context).size;
     return SizedBox(
-      height: screenSize.height * 0.3,
+      height: screenSize.height < 750
+          ? screenSize.height * 0.45
+          : screenSize.height * 0.5,
       width: screenSize.width * 0.9,
       child: Card(
         color: secondaryColor,
@@ -48,9 +47,10 @@ Widget _headerCard(screenSize) {
         children: [
           Container(
             padding: const EdgeInsets.only(left: 10, top: 10, bottom: 10),
-            child: const CircleAvatar(
+            child: CircleAvatar(
               backgroundColor: primaryColor,
               radius: 25,
+              backgroundImage: Image.asset("./assets/fernando.jpg").image,
             ),
           ),
           SizedBox(
@@ -63,10 +63,10 @@ Widget _headerCard(screenSize) {
                     style: secondaryFontStyle[1],
                   ),
                 ),
-                Container(
+                SizedBox(
                   child: Text(
                     "12 min ago",
-                    style: secondaryFontStyle[4],
+                    style: secondaryFontStyle[5],
                   ),
                 ),
               ],
@@ -108,7 +108,9 @@ Widget _headerCard(screenSize) {
 Widget _content(screenSize) {
   return Flexible(
     child: Container(
-      height: screenSize.height * 0.3,
+      height: screenSize.height < 750
+          ? screenSize.height * 0.45
+          : screenSize.height * 0.5,
       width: screenSize.width,
       decoration: BoxDecoration(
         color: primaryColor,
@@ -118,26 +120,37 @@ Widget _content(screenSize) {
         children: [
           Row(
             children: [
-              Container(
-                height: screenSize.height * 0.2,
-                width: screenSize.width * 0.5,
-                alignment: Alignment.bottomLeft,
-                padding: const EdgeInsets.only(left: 20, bottom: 10),
-                child: Text(
-                  "askdhjkasakjshdajkshdakjshdjakshdkjashdjkashdjakshdjaksdhaksjhdkas",
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 3,
-                  softWrap: true,
-                  style: secondaryFontStyle[2],
+              Flexible(
+                child: Container(
+                  height: screenSize.height < 750
+                      ? screenSize.height * 0.45
+                      : screenSize.height * 0.5,
+                  width: screenSize.width * 0.5,
+                  alignment: Alignment.bottomLeft,
+                  padding: const EdgeInsets.only(left: 20, bottom: 10),
+                  child: Text(
+                    "askdhjkasakjshdajkshdakjshdjakshdkjashdjkashdjakshdjaksdhaksjhdkas",
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 3,
+                    softWrap: true,
+                    style: secondaryFontStyle[2],
+                  ),
                 ),
               ),
               Container(
                 //color: Colors.red,
-                height: screenSize.height * 0.2,
+                height: screenSize.height < 750
+                    ? screenSize.height * 0.35
+                    : screenSize.height * 0.5,
 
                 alignment: Alignment.bottomRight,
-                padding:
-                    EdgeInsets.only(left: Platform.isIOS ? 40 : 50, bottom: 10),
+                padding: EdgeInsets.only(
+                    left: Platform.isIOS
+                        ? 40
+                        : screenSize.width < 400
+                            ? 30
+                            : 50,
+                    bottom: 10),
                 child: Row(
                   children: [
                     IconButton(

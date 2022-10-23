@@ -1,0 +1,11 @@
+{
+    "result": {
+        "_id": "633b3886cc4107345caf8fcf",
+        "username": "fernandosini",
+        "firstname": "fernando",
+        "lastname": "sinigaglia",
+        "email": "sinigagliafernando@gmail.com",
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2NjQ4NjI5NTMsInVzZXJJZCI6IjYzM2IzODg2Y2M0MTA3MzQ1Y2FmOGZjZiJ9.iYB1N8e3604RYk9QKglH5WdzPD6eX2rlnjOfkMCM-BA",
+        "createdAt": "2022-10-03T19:31:18.738Z"
+    }
+}

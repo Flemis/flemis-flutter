@@ -1,4 +1,5 @@
 import 'package:sqflite/sqflite.dart';
+// ignore: depend_on_referenced_packages
 import 'package:path/path.dart';
 
 class DatabaseMobile {
@@ -29,7 +30,7 @@ class DatabaseMobile {
     );
   }
 
-  static Future<dynamic> getByKey(String key) async {
+  static Future<dynamic>? getByKey(String key) async {
     var db = await open();
     var list = await db.rawQuery(
         'SELECT configValue FROM Configuration WHERE configName = ?',

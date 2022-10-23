@@ -1,7 +1,8 @@
+import 'package:flemis/mobile/controller/auth_controller.dart';
 import 'package:flemis/mobile/my_app_mobile.dart';
+import 'package:flemis/mobile/utils/navigator.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 
 class MobileLoginScreen extends StatefulWidget {
   const MobileLoginScreen({Key? key}) : super(key: key);
@@ -11,33 +12,61 @@ class MobileLoginScreen extends StatefulWidget {
 }
 
 class _MobileLoginScreenState extends State<MobileLoginScreen> {
-  TextEditingController userNameController = TextEditingController(text: "");
-  TextEditingController passwordController = TextEditingController(text: "");
+  bool visiblePassword = false;
+  AuthController? authController;
+  AppNavigator? navigator;
+  @override
+  void initState() {
+    navigator = AppNavigator(context: context);
+    authController = AuthController(context: context);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    authController?.userNameController.dispose();
+    authController?.passwordController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     var screenSize = MediaQuery.of(context).size;
     return Scaffold(
+      extendBodyBehindAppBar: screenSize.height < 750 ? true : false,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: transparentColor,
       ),
       backgroundColor: primaryColor,
+      resizeToAvoidBottomInset: false,
       body: SizedBox(
         height: screenSize.height,
         width: screenSize.width,
         child: SingleChildScrollView(
+          padding: screenSize.height < 700
+              ? const EdgeInsets.only(top: 15)
+              : screenSize.height < 750
+                  ? const EdgeInsets.only(top: 45)
+                  : null,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               SizedBox(
                 child: Text(
-                  "Logo",
-                  style: primaryFontStyle[0],
+                  "Flemis",
+                  style: screenSize.height < 700
+                      ? primaryFontStyle[1]
+                      : primaryFontStyle[0],
                 ),
               ),
               SizedBox(
-                height: screenSize.height * 0.1,
+                height: screenSize.height < 700
+                    ? screenSize.height * 0.04
+                    : screenSize.height < 800
+                        ? screenSize.height * 0.05
+                        : screenSize.height * 0.1,
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,7 +82,7 @@ class _MobileLoginScreenState extends State<MobileLoginScreen> {
                     height: 50,
                     width: screenSize.width * 0.85,
                     child: TextFormField(
-                      controller: userNameController,
+                      controller: authController?.userNameController,
                       textAlignVertical: TextAlignVertical.center,
                       decoration: InputDecoration(
                         contentPadding:
@@ -62,8 +91,9 @@ class _MobileLoginScreenState extends State<MobileLoginScreen> {
                         fillColor: const Color(0xffB7BDF7),
                         focusedBorder: OutlineInputBorder(
                           borderSide: const BorderSide(
-                              //color: Theme.of(context).colorScheme.surface,
-                              ),
+                            width: 1,
+                            color: secondaryColor,
+                          ),
                           borderRadius: BorderRadius.circular(5),
                         ),
                         enabledBorder: OutlineInputBorder(
@@ -94,9 +124,33 @@ class _MobileLoginScreenState extends State<MobileLoginScreen> {
                     height: 50,
                     width: screenSize.width * 0.85,
                     child: TextFormField(
-                      controller: passwordController,
+                      controller: authController?.passwordController,
                       textAlignVertical: TextAlignVertical.center,
+                      autofocus: false,
+                      obscureText: !visiblePassword,
                       decoration: InputDecoration(
+                        suffixIconColor: secondaryColor,
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            !visiblePassword
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                            color:
+                                visiblePassword ? secondaryColor : whiteColor,
+                            size: 20,
+                          ),
+                          onPressed: () {
+                            if (!visiblePassword) {
+                              setState(() {
+                                visiblePassword = true;
+                              });
+                            } else {
+                              setState(() {
+                                visiblePassword = false;
+                              });
+                            }
+                          },
+                        ),
                         contentPadding:
                             const EdgeInsets.only(bottom: 10, left: 20),
                         filled: true,
@@ -104,7 +158,7 @@ class _MobileLoginScreenState extends State<MobileLoginScreen> {
                         focusedBorder: OutlineInputBorder(
                           borderSide: const BorderSide(
                             width: 0.5,
-                            //color: Theme.of(context).colorScheme.surface,
+                            color: secondaryColor,
                           ),
                           borderRadius: BorderRadius.circular(5),
                         ),
@@ -125,7 +179,7 @@ class _MobileLoginScreenState extends State<MobileLoginScreen> {
                 margin: const EdgeInsets.only(top: 40),
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    primary: primaryColor,
+                    backgroundColor: primaryColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                       side: const BorderSide(
@@ -133,7 +187,12 @@ class _MobileLoginScreenState extends State<MobileLoginScreen> {
                       ),
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: () async {
+                    authController?.login(
+                        authController!.userNameController.text,
+                        authController!.passwordController.text);
+                    FocusManager.instance.primaryFocus?.unfocus();
+                  },
                   child: Text(
                     "Login",
                     style: primaryFontStyle[6],
@@ -144,7 +203,7 @@ class _MobileLoginScreenState extends State<MobileLoginScreen> {
                 margin: const EdgeInsets.only(top: 20),
                 child: TextButton(
                   child: Text(
-                    "Forgot password ?",
+                    "Forgot password?",
                     style: primaryFontStyle[7],
                     softWrap: true,
                     textAlign: TextAlign.center,
@@ -152,16 +211,35 @@ class _MobileLoginScreenState extends State<MobileLoginScreen> {
                   onPressed: () {},
                 ),
               ),
+              //style: secondaryFontStyle[2],
+              Container(
+                margin: const EdgeInsets.only(top: 10),
+                child: RichText(
+                  text: TextSpan(
+                    text: "Don't have account? ",
+                    style: secondaryFontStyle[2],
+                    children: [
+                      TextSpan(
+                        text: " Register",
+                        style: primaryFontStyle[8],
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () => navigator?.goToRegister(),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               SizedBox(
-                height: 100,
+                height: screenSize.height < 700 ? 90 : 100,
                 width: screenSize.width,
                 child: Row(
                   children: <Widget>[
                     const Expanded(
-                        child: Divider(
-                      color: whiteColor,
-                      endIndent: 10,
-                    )),
+                      child: Divider(
+                        color: whiteColor,
+                        endIndent: 10,
+                      ),
+                    ),
                     Text(
                       "Or \n with",
                       style: primaryFontStyle[7],
@@ -176,55 +254,60 @@ class _MobileLoginScreenState extends State<MobileLoginScreen> {
                   ],
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {},
-                    child: null,
-                    style: ElevatedButton.styleFrom(
-                      primary: whiteColor,
-                      shape: const CircleBorder(),
-                      padding: const EdgeInsets.all(25),
+              Container(
+                padding: screenSize.height < 700
+                    ? const EdgeInsets.only(bottom: 20)
+                    : null,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {},
+                      child: null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: whiteColor,
+                        shape: const CircleBorder(),
+                        padding: const EdgeInsets.all(25),
+                      ),
                     ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {},
-                    child: null,
-                    style: ElevatedButton.styleFrom(
-                      primary: whiteColor,
-                      shape: const CircleBorder(),
-                      padding: const EdgeInsets.all(25),
+                    ElevatedButton(
+                      onPressed: () {},
+                      child: null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: whiteColor,
+                        shape: const CircleBorder(),
+                        padding: const EdgeInsets.all(25),
+                      ),
                     ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {},
-                    child: null,
-                    style: ElevatedButton.styleFrom(
-                      primary: whiteColor,
-                      shape: const CircleBorder(),
-                      padding: const EdgeInsets.all(25),
+                    ElevatedButton(
+                      onPressed: () {},
+                      child: null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: whiteColor,
+                        shape: const CircleBorder(),
+                        padding: const EdgeInsets.all(25),
+                      ),
                     ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {},
-                    child: null,
-                    style: ElevatedButton.styleFrom(
-                      primary: whiteColor,
-                      shape: const CircleBorder(),
-                      padding: const EdgeInsets.all(25),
+                    ElevatedButton(
+                      onPressed: () {},
+                      child: null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: whiteColor,
+                        shape: const CircleBorder(),
+                        padding: const EdgeInsets.all(25),
+                      ),
                     ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {},
-                    child: null,
-                    style: ElevatedButton.styleFrom(
-                      primary: whiteColor,
-                      shape: const CircleBorder(),
-                      padding: const EdgeInsets.all(25),
+                    ElevatedButton(
+                      onPressed: () {},
+                      child: null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: whiteColor,
+                        shape: const CircleBorder(),
+                        padding: const EdgeInsets.all(25),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               )
             ],
           ),

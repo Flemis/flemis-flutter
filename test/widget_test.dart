@@ -7,14 +7,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import '../lib/mobile/my_app_mobile.dart' if (dart.library.html) '../lib/web/my_app_web.dart'
+import 'package:flemis/mobile/my_app_mobile.dart' if (dart.library.html) '../lib/web/my_app_web.dart'
     as my_app;
-import 'package:flemis/main.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(my_app.MyApp());
+    await tester.pumpWidget(const my_app.MyApp());
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);
