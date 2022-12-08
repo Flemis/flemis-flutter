@@ -4,19 +4,24 @@ import 'package:loading_indicator/loading_indicator.dart';
 import '../../../../my_app_mobile.dart';
 
 class Loading extends StatelessWidget {
-  const Loading({super.key, required this.context});
+  const Loading({super.key, required this.context, this.color});
   final BuildContext context;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Center(
       child: SizedBox(
-        height: 200,
+        height: 300,
         width: 200,
-        child: LoadingIndicator(
-          indicatorType: Indicator.ballClipRotateMultiple,
-          colors: [
-            secondaryColor,
+        child: Column(
+          children: [
+            LoadingIndicator(
+              indicatorType: Indicator.ballClipRotateMultiple,
+              colors: [
+                color != null ? color! : secondaryColor,
+              ],
+            ),
           ],
         ),
       ),

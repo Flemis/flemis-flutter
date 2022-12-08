@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:provider/provider.dart';
 
+import '../../../models/post.dart';
 import '../notifications/notifications_screen.dart';
 
 /* 
@@ -26,23 +27,31 @@ class _MobileHomeState extends State<MobileHome> {
   ValueNotifier<bool> resetCache = ValueNotifier<bool>(false);
   PostController? controller;
   Manager? manager;
-  Future? data;
+  Future? _future;
   final analytics = FirebaseAnalytics.instance;
   @override
   void initState() {
     super.initState();
+    analytics.setCurrentScreen(screenName: "home");
     controller = PostController(context: context);
-    manager = context.read<Manager>();  
+    manager = context.read<Manager>();
+    _future = controller?.getFeed({
+      "_id": manager!.user!.id!,
+      "following": manager!.user!.following?.toList()
+    });
   }
 
   @override
   void didChangeDependencies() async {
-    await analytics.setCurrentScreen(screenName: "Home");
     super.didChangeDependencies();
   }
 
   Future refresh() async {
     resetCache.value = !resetCache.value;
+    _future = controller?.getFeed({
+      "_id": manager!.user!.id!,
+      "following": manager!.user!.following?.toList()
+    });
     return;
   }
 
@@ -71,8 +80,11 @@ class _MobileHomeState extends State<MobileHome> {
                     ),
                     Expanded(
                       child: Text(
-                        manager!.user!.username ?? "",
-                        style: primaryFontStyle[4],
+                        manager!.user!.username!.length >= 15
+                            ? manager!.user!.username!.replaceRange(
+                                15, manager!.user!.username!.length, "...")
+                            : manager!.user!.username! ?? "",
+                        style: primaryFontStyle[7],
                       ),
                     ),
                   ],
@@ -92,8 +104,11 @@ class _MobileHomeState extends State<MobileHome> {
                     ),
                     Expanded(
                       child: Text(
-                        "Fernandosini",
-                        style: primaryFontStyle[4],
+                        manager!.user!.username!.length >= 15
+                            ? manager!.user!.username!.replaceRange(
+                                15, manager!.user!.username!.length, "...")
+                            : manager!.user!.username! ?? "",
+                        style: primaryFontStyle[7],
                       ),
                     ),
                   ],
@@ -151,28 +166,31 @@ class _MobileHomeState extends State<MobileHome> {
         ],
       ),
       backgroundColor: primaryColor,
-      body: ValueListenableBuilder(
-        valueListenable: resetCache,
-        builder: (context, value, _) {
-          return FutureBuilder(
-            future: controller?.getFeed(manager!.user!.id!),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Loading(context: context);
-              }
+      body: SizedBox(
+        child: ValueListenableBuilder(
+          valueListenable: resetCache,
+          builder: (context, value, _) {
+            return FutureBuilder(
+              future: _future,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Loading(context: context);
+                }
 
-              if (snapshot.hasData && snapshot.data != null) {
-                return content(screenSize, snapshot.data!);
-              }
-              return errorWidget(screenSize, snapshot);
-            },
-          );
-        },
+                if (snapshot.hasData && snapshot.data != null) {
+                  return content(screenSize, snapshot.data!);
+                }
+                return errorWidget(screenSize, snapshot);
+              },
+            );
+          },
+        ),
       ),
     );
   }
 
   Widget content(Size screenSize, Object data) {
+    List<Post> postList = data as List<Post>;
     return AnimationConfiguration.staggeredList(
       position: 0,
       child: SlideAnimation(
@@ -187,15 +205,15 @@ class _MobileHomeState extends State<MobileHome> {
               height: screenSize.height,
               width: screenSize.width,
               child: SingleChildScrollView(
-                padding: const EdgeInsets.only(
-                  top: 0,
-                ),
+                padding: const EdgeInsets.only(top: 0, bottom: 100),
                 physics: const BouncingScrollPhysics(
                     parent: AlwaysScrollableScrollPhysics()),
                 child: Column(
-                  children: const [
-                    CustomPostCard(),
-                  ],
+                  children: postList
+                      .map((e) => CustomPostCard(
+                            post: e,
+                          ))
+                      .toList(),
                 ),
               ),
             ),
@@ -231,9 +249,12 @@ class _MobileHomeState extends State<MobileHome> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      data.error != null ? data.error.toString() : "no data",
-                      style: const TextStyle(color: whiteColor),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20, right: 20),
+                      child: Text(
+                        data.error != null ? data.error.toString() : "no data",
+                        style: const TextStyle(color: whiteColor),
+                      ),
                     ),
                   ],
                 ),

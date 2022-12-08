@@ -223,13 +223,13 @@ class DefaultService {
   }
 
   Future<Response> post(String url, {Map<dynamic, dynamic>? body}) async {
-    // var token = await getToken();
+    var token = await getToken();
     final response = await http.post(Uri.parse(url),
         body: json.encode(body),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
-          // "Authorization": "Bearer $token",
+          "Authorization": "Bearer $token",
         },
         encoding: Encoding.getByName("utf-8"));
     return response;
@@ -237,10 +237,19 @@ class DefaultService {
 
   Future<Response> multiPartForm(
       String url, http.MultipartRequest request) async {
+    var token = await getToken();
+
+    Map<String, String> headers = {
+      "Content-Type": "multipart/form-data",
+      "Access-Control-Allow-Origin": "*", // Required for CORS support to work
+      "Access-Control-Allow-Methods": "GET, PUT, DELETE, POST, OPTIONS",
+      "Authorization": "Bearer $token",
+    };
+    request.headers.addAll(headers);
+
     final response = await http.Response.fromStream(await request.send());
     return response;
   }
-  
 
   Future<Response> delete(String url, {Map<dynamic, dynamic>? body}) async {
     var token = await getToken();

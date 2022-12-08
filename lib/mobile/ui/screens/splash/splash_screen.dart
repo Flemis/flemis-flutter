@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flemis/mobile/controller/user_controller.dart';
+import 'package:flemis/mobile/data/mobile_db.dart';
 import 'package:flemis/mobile/my_app_mobile.dart';
 import 'package:flemis/mobile/providers/manager.dart';
 import 'package:flemis/mobile/repository/user_repository.dart';
@@ -36,6 +37,7 @@ class _SplashScreenState extends State<SplashScreen> {
         .read()
         .catchError((error, stack) => null)
         .then((value) => value);
+
     if (user != null) {
       manager?.user = user;
       if (!JwtDecoder.isExpired(user.token!)) {
@@ -44,6 +46,7 @@ class _SplashScreenState extends State<SplashScreen> {
           () => navigator?.goToBase(),
         );
       } else {
+        await DatabaseMobile.deleteAll();
         Timer(
           const Duration(seconds: 5),
           () => navigator?.goToLogin(),
@@ -51,6 +54,7 @@ class _SplashScreenState extends State<SplashScreen> {
       }
     } else {
       if (!mounted) {}
+      await DatabaseMobile.deleteAll();
       Timer(
         const Duration(seconds: 5),
         () => navigator?.goToLogin(),

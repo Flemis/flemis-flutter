@@ -1,7 +1,15 @@
+import 'dart:async';
 import 'dart:io';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:flemis/mobile/controller/notifications_controller.dart';
+import 'package:flemis/mobile/models/notifications.dart';
+import 'package:flemis/mobile/providers/manager.dart';
+import 'package:flemis/mobile/ui/widgets/components/loading/loading.dart';
 import 'package:flemis/mobile/ui/widgets/components/notifications/notification_list_item.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:provider/provider.dart';
 
 import '../../../my_app_mobile.dart';
 
@@ -15,6 +23,40 @@ class NotificationsScreen extends StatefulWidget {
 }
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
+  ValueNotifier<bool> resetCache = ValueNotifier<bool>(false);
+  NotificationsController? notificationsController;
+  Manager? manager;
+  StreamController streamController = StreamController.broadcast();
+  final analytics = FirebaseAnalytics.instance;
+  @override
+  void initState() {
+    analytics.setCurrentScreen(screenName: "notifications");
+    notificationsController = NotificationsController();
+    manager = context.read<Manager>();
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() async {
+    super.didChangeDependencies();
+    await notificationsController
+        ?.getNotifications(manager!.user!.id!)
+        .then((value) => streamController.sink.add(value))
+        .catchError((error, stack) => streamController.sink.addError(error));
+  }
+
+  Future onRefresh() async {
+    //future = notificationsController?.getNotifications(manager!.user!.id!);
+    resetCache.value = !resetCache.value;
+    return;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    streamController.close();
+  }
+
   @override
   Widget build(BuildContext context) {
     var screenSize = MediaQuery.of(context).size;
@@ -40,8 +82,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     ),
                     Expanded(
                       child: Text(
-                        "Fernandosini",
-                        style: primaryFontStyle[4],
+                        manager!.user!.username!,
+                        style: primaryFontStyle[7],
                       ),
                     ),
                   ],
@@ -61,8 +103,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     ),
                     Expanded(
                       child: Text(
-                        "Fernandosini",
-                        style: primaryFontStyle[4],
+                        manager!.user!.username!,
+                        style: primaryFontStyle[7],
                       ),
                     ),
                   ],
@@ -123,48 +165,84 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         ],
       ),
       backgroundColor: primaryColor,
-      body: SizedBox(
-        height: screenSize.height,
-        width: screenSize.width,
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(
-            parent: AlwaysScrollableScrollPhysics(),
-          ),
-          child: Column(
-            children: [
-              SizedBox(
-                height: 100,
-                width: screenSize.height,
-                //color: Colors.red,
-                child: Row(
-                  children: const [],
+      body: ValueListenableBuilder(
+        valueListenable: resetCache,
+        builder: (context, isCacheReseted, _) {
+          return StreamBuilder(
+            stream: streamController.stream,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Loading(context: context);
+              }
+              if (snapshot.hasData && snapshot.data != null) {
+                List<Notifications> notifications =
+                    snapshot.data as List<Notifications>;
+                return notificationList(screenSize, notifications);
+              }
+              return SizedBox(
+                height: screenSize.height * .6,
+                child: Center(
+                  child: Text(
+                    snapshot.error != null
+                        ? snapshot.error.toString()
+                        : "no data",
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: whiteColor),
+                  ),
                 ),
-              ),
-              const Divider(
-                color: whiteColor,
-              ),
-              Column(
-                children: List.from(
-                  [
-                    0,
-                    1,
-                    2,
-                    3,
-                    4,
-                    6,
-                    7,
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  Widget notificationList(Size screenSize, List<Notifications> notifications) {
+    return AnimationConfiguration.staggeredList(
+      position: 0,
+      child: FadeInAnimation(
+        duration: const Duration(seconds: 2),
+        curve: Curves.ease,
+        child: RefreshIndicator(
+          onRefresh: onRefresh,
+          color: secondaryColor,
+          backgroundColor: primaryColor,
+          child: SizedBox(
+            height: screenSize.height,
+            width: screenSize.width,
+            child: ListView.builder(
+              physics: const BouncingScrollPhysics(),
+              itemCount: notifications.length,
+              itemBuilder: (context, index) {
+                if (index <= 0) {
+                  return _followersRequests(screenSize);
+                }
+                return Column(
+                  children: [
+                    const Divider(
+                      color: whiteColor,
+                    ),
+                    NotificationListItem(
+                      element: notifications[index],
+                    ),
                   ],
-                )
-                    .map(
-                      (e) => NotificationListItem(
-                        element: e.toString(),
-                      ),
-                    )
-                    .toList(),
-              ),
-            ],
+                );
+              },
+            ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _followersRequests(Size screenSize) {
+    return SizedBox(
+      height: 100,
+      width: screenSize.height,
+      //color: Colors.red,
+      child: Row(
+        children: const [],
       ),
     );
   }

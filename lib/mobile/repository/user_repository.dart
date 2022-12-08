@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flemis/mobile/data/mobile_db.dart';
+import 'package:idb_shim/idb.dart';
 
 import '../models/user.dart';
 
@@ -17,5 +18,15 @@ class UserRepository {
     } else {
       return null;
     }
+  }
+
+  Future<void> delete() async {
+    await DatabaseMobile.delete("user");
+  }
+
+  Future<void> updateUserLocally(User user) async {
+    await delete();
+    await save(user);
+    print("refreshed");
   }
 }

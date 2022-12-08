@@ -1,8 +1,10 @@
 import 'dart:io';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flemis/mobile/controller/account_controller.dart';
 import 'package:flemis/mobile/models/user.dart';
 import 'package:flemis/mobile/my_app_mobile.dart';
+import 'package:flemis/mobile/repository/user_repository.dart';
 import 'package:flemis/mobile/ui/widgets/components/loading/loading.dart';
 import 'package:flemis/mobile/utils/navigator.dart';
 import 'package:flutter/cupertino.dart';
@@ -12,11 +14,14 @@ import 'package:fluttericon/font_awesome5_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
+import '../../../controller/user_controller.dart';
 import '../../../providers/manager.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
-
+  const ProfileScreen({Key? key, this.user, this.isYourProfile = false})
+      : super(key: key);
+  final bool isYourProfile;
+  final User? user;
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
@@ -26,17 +31,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
   AppNavigator? navigator;
   Manager? manager;
   AccountController? accountController;
+  UserController? _userController;
+  final UserRepository _repository = UserRepository();
+  final analytics = FirebaseAnalytics.instance;
   @override
   void initState() {
+    analytics.setCurrentScreen(screenName: "profile");
+    _userController = UserController(context: context);
     accountController = AccountController(context: context);
     manager = context.read<Manager>();
     navigator = AppNavigator(context: context);
     super.initState();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
   }
 
   Future onRefresh() async {
@@ -238,172 +243,349 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: Row(
           children: const [],
         ),
+        leading: (widget.isYourProfile && widget.user == null) ||
+                manager?.currentPage.value == 4
+            ? null
+            : IconButton(
+                icon: const Icon(
+                  Icons.close,
+                  size: 30,
+                ),
+                padding: const EdgeInsets.only(left: 15),
+                onPressed: () {
+                  navigator?.backPage();
+                },
+              ),
         actions: [
-          if (Platform.isAndroid)
-            Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.only(top: 30),
-                      child: IconButton(
-                        icon: const Icon(
-                          Icons.more_vert,
-                          size: 30,
-                          color: whiteColor,
+          if (widget.isYourProfile)
+            if (Platform.isAndroid)
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.only(top: 30),
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            fixedSize: const Size.fromHeight(40),
+                            backgroundColor: primaryColor,
+                            shape: const CircleBorder(),
+                          ),
+                          child: const Icon(
+                            Icons.edit,
+                            size: 25,
+                            color: whiteColor,
+                          ),
+                          onPressed: () async =>
+                              navigator?.goToEditProfile(user: manager!.user),
                         ),
-                        onPressed: () async =>
-                            navigator?.goToEditProfile(user: manager!.user),
                       ),
-                    ),
-                  ],
-                ),
-              ],
-            )
+                      Container(
+                        margin: const EdgeInsets.only(top: 30),
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            fixedSize: const Size.fromHeight(40),
+                            backgroundColor: primaryColor,
+                            shape: const CircleBorder(),
+                          ),
+                          child: const Icon(
+                            Icons.settings,
+                            size: 25,
+                            color: whiteColor,
+                          ),
+                          onPressed: () async =>
+                              navigator?.goToSettings(isAnimated: true),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              )
+            else
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.only(top: 10),
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            fixedSize: const Size.fromHeight(40),
+                            backgroundColor: primaryColor,
+                            shape: const CircleBorder(),
+                          ),
+                          child: const Icon(
+                            Icons.edit,
+                            size: 25,
+                            color: whiteColor,
+                          ),
+                          onPressed: () async =>
+                              navigator?.goToEditProfile(user: manager!.user),
+                        ),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.only(top: 10),
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            fixedSize: const Size.fromHeight(40),
+                            backgroundColor: primaryColor,
+                            shape: const CircleBorder(),
+                          ),
+                          child: const Icon(
+                            Icons.settings,
+                            size: 25,
+                            color: whiteColor,
+                          ),
+                          onPressed: () async =>
+                              navigator?.goToSettings(isAnimated: true),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              )
           else
-            Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.only(top: 30),
-                      child: IconButton(
-                        icon: const Icon(
-                          Icons.more_vert,
-                          size: 30,
-                          color: whiteColor,
-                        ),
-                        onPressed: () async =>
-                            navigator?.goToEditProfile(user: manager!.user),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+            const SizedBox(),
           const SizedBox(
             width: 20,
           ),
         ],
       ),
       body: ValueListenableBuilder(
-          valueListenable: resetCache,
-          builder: (context, isReseted, _) {
-            return FutureBuilder(
-              future: accountController?.getProfileInfo(manager!.user!.id!),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Loading(context: context);
-                }
+        valueListenable: resetCache,
+        builder: (context, isReseted, _) {
+          return FutureBuilder(
+            future: !widget.isYourProfile && widget.user != null
+                ? accountController?.getProfileInfo(widget.user!.id!)
+                : accountController?.getProfileInfo(manager!.user!.id!),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Padding(
+                  padding: const EdgeInsets.only(top: 150.0),
+                  child: Loading(context: context),
+                );
+              }
 
-                if (snapshot.hasData && snapshot.data != null) {
-                  User user = snapshot.data as User;
-                  return AnimationConfiguration.staggeredList(
-                    position: 0,
-                    child: FadeInAnimation(
-                      duration: const Duration(seconds: 2),
-                      curve: Curves.ease,
-                      child: RefreshIndicator(
-                        onRefresh: onRefresh,
-                        color: secondaryColor,
-                        backgroundColor: primaryColor,
-                        child: SizedBox(
-                          height: screenSize.height,
-                          width: screenSize.width,
-                          child: SingleChildScrollView(
-                            physics: const BouncingScrollPhysics(
-                              parent: AlwaysScrollableScrollPhysics(),
-                            ),
-                            child: Stack(
-                              children: [
-                                backgroundCover(screenSize, user),
-                                backgroundCoverGradient(screenSize),
-                                Container(
-                                  height: screenSize.height * 0.95,
-                                  alignment: Alignment.center,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      _avatarWidget(context, screenSize, user),
-                                      Container(
-                                        padding: const EdgeInsets.only(top: 20),
-                                        child: Text(
-                                          user.username!,
-                                          style: secondaryFontStyle[2],
-                                        ),
+              if (snapshot.hasData && snapshot.data != null) {
+                User user = snapshot.data as User;
+                ValueNotifier<User> notifierUser = ValueNotifier(user);
+                return AnimationConfiguration.staggeredList(
+                  position: 0,
+                  child: FadeInAnimation(
+                    duration: const Duration(seconds: 2),
+                    curve: Curves.ease,
+                    child: RefreshIndicator(
+                      onRefresh: onRefresh,
+                      color: secondaryColor,
+                      backgroundColor: primaryColor,
+                      child: SizedBox(
+                        height: screenSize.height,
+                        width: screenSize.width,
+                        child: SingleChildScrollView(
+                          physics: const BouncingScrollPhysics(
+                            parent: AlwaysScrollableScrollPhysics(),
+                          ),
+                          child: Stack(
+                            children: [
+                              backgroundCover(screenSize, user),
+                              backgroundCoverGradient(screenSize),
+                              Container(
+                                height: screenSize.height * 0.8,
+                                alignment: Alignment.center,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    _avatarWidget(context, screenSize,
+                                        notifierUser, widget.isYourProfile),
+                                    Container(
+                                      padding: const EdgeInsets.only(top: 20),
+                                      child: Text(
+                                        user.username!,
+                                        style: secondaryFontStyle[2],
                                       ),
-                                      Container(
-                                        padding: const EdgeInsets.only(top: 10),
-                                        child: Text(
-                                          user.id!,
-                                          style: secondaryFontStyle[3],
-                                        ),
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.only(top: 10),
+                                      child: Text(
+                                        user.bio != null ? user.bio! : user.id!,
+                                        style: secondaryFontStyle[3],
                                       ),
-                                      _infoCard(screenSize, user),
-                                      _memories(screenSize, user),
-                                    ],
-                                  ),
+                                    ),
+                                    _infoCard(screenSize, notifierUser),
+                                    //  _memories(screenSize, user),
+                                  ],
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
                     ),
-                  );
-                }
-                return Center(
-                    child: Text(
-                  snapshot.error != null
-                      ? snapshot.error.toString()
-                      : "no data",
-                  style: const TextStyle(color: whiteColor),
-                ));
-              },
+                  ),
+                );
+              }
+              return Padding(
+                padding: const EdgeInsets.only(top: 40),
+                child: Center(
+                  child: Text(
+                    snapshot.error != null
+                        ? snapshot.error.toString()
+                        : "no data",
+                    style: const TextStyle(color: whiteColor),
+                  ),
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _avatarWidget(BuildContext context, Size screenSize,
+      ValueNotifier<User> notifier, bool isYourProfile) {
+    return InkWell(
+      onLongPress: () =>
+          !isYourProfile ? null : _openAvatarMenu(context, screenSize),
+      child: ValueListenableBuilder<User>(
+          valueListenable: notifier,
+          builder: (context, user, _) {
+            return Row(
+              mainAxisAlignment: !isYourProfile
+                  ? MainAxisAlignment.spaceAround
+                  : MainAxisAlignment.center,
+              children: !isYourProfile && widget.user != null
+                  ? [
+                      SizedBox(
+                        width: screenSize.width >= 400
+                            ? screenSize.width * 0.22
+                            : screenSize.width * 0.25,
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.yellow, width: 3),
+                          shape: BoxShape.circle,
+                        ),
+                        child: user.avatarUrl != null &&
+                                user.avatarUrl!.isNotEmpty
+                            ? CircleAvatar(
+                                backgroundImage: Image.network(
+                                  user.avatarUrl!,
+                                  loadingBuilder:
+                                      (context, child, loadingProgress) =>
+                                          Loading(
+                                    context: context,
+                                  ),
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      Image.asset("./assets/avatar.png"),
+                                  fit: BoxFit.cover,
+                                ).image,
+                                radius: 60,
+                              )
+                            : CircleAvatar(
+                                backgroundImage: Image.asset(
+                                  "./assets/avatar.png",
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      Image.asset("./assets/avatar.png"),
+                                  fit: BoxFit.cover,
+                                ).image,
+                                radius: 60,
+                              ),
+                      ),
+                      Padding(
+                        padding: user.followers == null ||
+                                !user.followers!.any(
+                                    (element) => element == manager!.user!.id!)
+                            ? const EdgeInsets.only(left: 0, right: 5.0)
+                            : const EdgeInsets.only(left: 5, right: 10.0),
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: user.followers == null ||
+                                      !user.followers!.any((element) =>
+                                          element == manager!.user!.id!)
+                                  ? secondaryColor
+                                  : primaryColor,
+                              foregroundColor: user.followers == null ||
+                                      !user.followers!.any((element) =>
+                                          element == manager!.user!.id!)
+                                  ? primaryColor
+                                  : Colors.red),
+                          onPressed: user.followers == null ||
+                                  !user.followers!.any((element) =>
+                                      element == manager!.user!.id!)
+                              ? () async {
+                                  notifier.value.followers
+                                      ?.add(manager!.user!.id!);
+                                  notifier.notifyListeners();
+                                  manager?.user!.following?.add(user.id!);
+                                  await _repository
+                                      .updateUserLocally(manager!.user!);
+                                  await _userController?.followUser(
+                                      manager!.user!.id!, user.id!);
+                                }
+                              : () async {
+                                  notifier.value.followers?.removeWhere(
+                                      (element) =>
+                                          element == manager?.user!.id);
+                                  notifier.notifyListeners();
+                                  manager?.user!.following?.removeWhere(
+                                      (element) => element == user.id!);
+                                  await _repository
+                                      .updateUserLocally(manager!.user!);
+                                  await _userController?.unfollowUser(
+                                      manager!.user!.id!, user.id!);
+                                },
+                          child: user.followers == null ||
+                                  !user.followers!.any((element) =>
+                                      element == manager!.user!.id!)
+                              ? const Text("Follow")
+                              : const Text("Unfollow"),
+                        ),
+                      )
+                    ]
+                  : [
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.yellow, width: 3),
+                          shape: BoxShape.circle,
+                        ),
+                        child: user.avatarUrl != null &&
+                                user.avatarUrl!.isNotEmpty
+                            ? CircleAvatar(
+                                backgroundImage: Image.network(
+                                  user.avatarUrl!,
+                                  loadingBuilder:
+                                      (context, child, loadingProgress) =>
+                                          Loading(
+                                    context: context,
+                                  ),
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      Image.asset("./assets/avatar.png"),
+                                  fit: BoxFit.cover,
+                                ).image,
+                                radius: 60,
+                              )
+                            : CircleAvatar(
+                                backgroundImage: Image.asset(
+                                  "./assets/avatar.png",
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      Image.asset("./assets/avatar.png"),
+                                  fit: BoxFit.cover,
+                                ).image,
+                                radius: 60,
+                              ),
+                      ),
+                    ],
             );
           }),
     );
   }
 
-  Widget _avatarWidget(BuildContext context, Size screenSize, User user) {
-    return InkWell(
-      onLongPress: () => _openAvatarMenu(context, screenSize),
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.yellow, width: 3),
-          shape: BoxShape.circle,
-        ),
-        child: user.avatarUrl != null && user.avatarUrl!.isNotEmpty
-            ? CircleAvatar(
-                backgroundImage: Image.network(
-                  user.avatarUrl!,
-                  loadingBuilder: (context, child, loadingProgress) => Loading(
-                    context: context,
-                  ),
-                  errorBuilder: (context, error, stackTrace) =>
-                      Image.asset("./assets/avatar.png"),
-                  fit: BoxFit.cover,
-                ).image,
-                radius: 60,
-              )
-            : CircleAvatar(
-                backgroundImage: Image.asset(
-                  "./assets/avatar.png",
-                  errorBuilder: (context, error, stackTrace) =>
-                      Image.asset("./assets/avatar.png"),
-                  fit: BoxFit.cover,
-                ).image,
-                radius: 60,
-              ),
-      ),
-    );
-  }
-
   Widget backgroundCoverGradient(Size screenSize) {
     return Container(
-      height: screenSize.height * 0.35,
+      height: screenSize.height * 0.355,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           stops: [0.0, 20.0],
@@ -427,12 +609,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 image: NetworkImage(user.avatarUrl!),
                 fit: BoxFit.cover,
               )
-            : null,
+            : const DecorationImage(
+                image: AssetImage(
+                  "./assets/avatar.png",
+                ),
+                fit: BoxFit.cover,
+              ),
       ),
     );
   }
 
-  Widget _infoCard(screenSize, User user) {
+  Widget _infoCard(screenSize, ValueNotifier<User> notifier) {
     return Container(
       height: 65,
       width: screenSize.width * 0.85,
@@ -446,33 +633,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
+          ValueListenableBuilder<User>(
+              valueListenable: notifier,
+              builder: (context, user, _) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      child: Text(
+                        user.followers == null || user.followers!.isEmpty
+                            ? "-"
+                            : user.followers!.length.toString(),
+                        style: secondaryFontStyle[0],
+                      ),
+                    ),
+                    Text(
+                      "followers",
+                      style: secondaryFontStyle[6],
+                    ),
+                  ],
+                );
+              }),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(
                 child: Text(
-                  user.followers == null || user.followers!.isEmpty
+                  notifier.value.subscribers == null ||
+                          notifier.value.subscribers!.isEmpty
                       ? "-"
-                      : user.followers!.length.toString(),
-                  style: secondaryFontStyle[0],
-                ),
-              ),
-              Text(
-                "followers",
-                style: secondaryFontStyle[6],
-              ),
-            ],
-          ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(
-                child: Text(
-                  user.subscribers == null || user.subscribers!.isEmpty
-                      ? "-"
-                      : user.subscribers!.length.toString(),
+                      : notifier.value.subscribers!.length.toString(),
                   style: secondaryFontStyle[0],
                 ),
               ),
