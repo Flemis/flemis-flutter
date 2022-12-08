@@ -2,12 +2,17 @@ import 'package:device_preview/device_preview.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flemis/mobile/providers/manager.dart';
 import 'package:flemis/mobile/ui/screens/Base/mobile_base.dart';
+import 'package:flemis/mobile/ui/screens/chat/message/message_screen.dart';
 import 'package:flemis/mobile/ui/screens/home/mobile_home.dart';
 import 'package:flemis/mobile/ui/screens/login/mobile_login_screen.dart';
+import 'package:flemis/mobile/ui/screens/post/create/create_post_screen.dart';
+import 'package:flemis/mobile/ui/screens/post/create/create_post_screen_forms.dart';
 import 'package:flemis/mobile/ui/screens/profile/edit/mobile_edit_profile_screen.dart';
 import 'package:flemis/mobile/ui/screens/profile/profile_screen.dart';
 import 'package:flemis/mobile/ui/screens/register/mobile_register.dart';
+import 'package:flemis/mobile/ui/screens/settings/settings_screen.dart';
 import 'package:flemis/mobile/ui/screens/splash/splash_screen.dart';
+import 'package:flemis/mobile/ui/screens/story/create/create_story_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -200,7 +205,20 @@ List<TextStyle> secondaryFontStyle = <TextStyle>[
       fontSize: 20,
       fontWeight: FontWeight.bold,
       fontFamily: GoogleFonts.inter().fontFamily),
+  TextStyle(
+      color: whiteColor,
+      fontSize: 15,
+      fontWeight: FontWeight.bold,
+      wordSpacing: 4,
+      fontFamily: GoogleFonts.inter().fontFamily),
 ];
+TextStyle errorStyle = TextStyle(
+  color: Colors.red,
+  fontSize: 15,
+  fontWeight: FontWeight.bold,
+  wordSpacing: 4,
+  fontFamily: GoogleFonts.inter().fontFamily,
+);
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -250,6 +268,11 @@ class _MyAppState extends State<MyApp> {
               "/register": (context) => const MobileRegister(),
               "/edit": (context) => const MobileEditProfileScreen(),
               "/profile": (context) => const ProfileScreen(),
+              "/chat": (context) => const MessageScreen(),
+              "/createPost": (context) => const CreatePostScreen(),
+              "/createStory": (context) => const CreateStoryScreen(),
+              "/settings": (context) => const SettingsScreen(),
+              "/createPostForm": (context) => const CreatePostScreenForms()
             },
           ),
         ),

@@ -4,10 +4,16 @@ import 'package:flemis/mobile/controller/chat_controller.dart';
 import 'package:flemis/mobile/my_app_mobile.dart';
 import 'package:flemis/mobile/ui/widgets/components/chat/chat_list_item.dart';
 import 'package:flemis/mobile/ui/widgets/components/loading/loading.dart';
+import 'package:flemis/mobile/utils/navigator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:fluttericon/font_awesome5_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 
+import '../../../controller/user_controller.dart';
+import '../../../models/chat.dart';
+import '../../../providers/manager.dart';
 import '../../widgets/components/search/custom_search_delegate.dart';
 
 class ChatListScreen extends StatefulWidget {
@@ -25,6 +31,7 @@ class _ChatListScreenState extends State<ChatListScreen>
 
   AnimationController? controllerAnimation;
   Animation<double>? _fadeAnimation;
+  AppNavigator? appNavigator;
 
   final ValueNotifier<bool> resetCache = ValueNotifier(false);
   Future<void> _showSearch() async {
@@ -36,16 +43,26 @@ class _ChatListScreenState extends State<ChatListScreen>
   }
 
   ChatController? chatController;
+  UserController? userController;
+  Manager? manager;
 
   @override
   void initState() {
+    manager = context.read<Manager>();
+    appNavigator = AppNavigator(context: context);
     super.initState();
     chatController = ChatController(context: context);
+    userController = UserController(context: context);
     controllerAnimation =
         AnimationController(vsync: this, duration: const Duration(seconds: 3));
     _fadeAnimation =
         Tween<double>(begin: 0, end: 1).animate(controllerAnimation!);
     controllerAnimation?.reverse();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
   }
 
   Future onRefresh() async {
@@ -80,8 +97,13 @@ class _ChatListScreenState extends State<ChatListScreen>
                     ),
                     Expanded(
                       child: Text(
-                        "Fernandosini",
-                        style: primaryFontStyle[4],
+                        manager!.user!.username!.length >= 15
+                            ? manager!.user!.username!.replaceRange(
+                                15, manager!.user!.username!.length, "...")
+                            : manager!.user!.username!,
+                        style: primaryFontStyle[7],
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: true,
                       ),
                     ),
                   ],
@@ -107,8 +129,11 @@ class _ChatListScreenState extends State<ChatListScreen>
                           ),
                           Expanded(
                             child: Text(
-                              "Fernandosini",
-                              style: primaryFontStyle[4],
+                              manager!.user!.username!.length >= 15
+                                  ? manager!.user!.username!.replaceRange(15,
+                                      manager!.user!.username!.length, "...")
+                                  : manager!.user!.username! ?? "",
+                              style: primaryFontStyle[7],
                             ),
                           ),
                         ],
@@ -256,54 +281,82 @@ class _ChatListScreenState extends State<ChatListScreen>
                 color: secondaryColor,
                 onRefresh: onRefresh,
                 child: FutureBuilder(
-                    future: chatController?.loadConversations(),
-                    builder: (context, AsyncSnapshot<dynamic> snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done &&
-                              snapshot.data == null ||
-                          snapshot.data?.length == 0 ||
-                          snapshot.error != null ||
-                          snapshot.hasError ||
-                          !snapshot.hasData) {
-                        return Center(
-                          child: SizedBox(
-                            height: 200,
-                            width: 200,
-                            child: Text(
-                              snapshot.error.toString(),
-                            ),
-                          ),
-                        );
-                      }
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Loading(context: context);
-                      }
-                      return SingleChildScrollView(
-                        physics: const BouncingScrollPhysics(
-                          parent: AlwaysScrollableScrollPhysics(),
-                        ),
-                        child: Column(
-                          children: List.from(
-                            [
-                              0,
-                              1,
-                              2,
-                              3,
-                              4,
-                              6,
-                              7,
-                            ],
-                          )
-                              .map(
-                                (e) => ChatListItem(
-                                  element: e.toString(),
-                                ),
-                              )
-                              .toList(),
-                        ),
-                      );
-                    }),
+                  future:
+                      chatController?.getAllConversations(manager!.user!.id!),
+                  builder: (context, AsyncSnapshot<dynamic> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Loading(context: context);
+                    }
+                    if (snapshot.hasData || snapshot.data != null) {
+                      return chatItem(snapshot);
+                    }
+                    return errorWidget(screenSize, snapshot);
+                  },
+                ),
               );
             }),
+      ),
+    );
+  }
+
+  Widget chatItem(AsyncSnapshot snapshot) {
+    List<Chat> chats = snapshot.data;
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(
+        parent: AlwaysScrollableScrollPhysics(),
+      ),
+      child: Column(
+        children: chats
+            .map(
+              (e) => ChatListItem(
+                element: e,
+                navigator: appNavigator!,
+              ),
+            )
+            .toList(),
+      ),
+    );
+  }
+
+  Widget errorWidget(Size screenSize, AsyncSnapshot data) {
+    return AnimationConfiguration.staggeredList(
+      position: 0,
+      child: FadeInAnimation(
+        duration: const Duration(seconds: 2),
+        curve: Curves.ease,
+        child: RefreshIndicator(
+          backgroundColor: primaryColor,
+          displacement: 0,
+          onRefresh: onRefresh,
+          color: secondaryColor,
+          child: SizedBox(
+            height: screenSize.height,
+            width: screenSize.width,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.only(
+                top: 0,
+              ),
+              physics: const BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics(),
+              ),
+              child: SizedBox(
+                height: screenSize.height * 0.7,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20, right: 20),
+                      child: Text(
+                        data.error != null ? data.error.toString() : "no data",
+                        style: const TextStyle(color: whiteColor),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

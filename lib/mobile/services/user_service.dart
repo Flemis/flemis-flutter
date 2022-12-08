@@ -26,23 +26,21 @@ class UserService extends DefaultService {
     }
   }
 
-  Future<APIResponse> updateProfile(
-      Map<String, dynamic> body, Map<String, dynamic>? file) async {
+  Future<APIResponse> updateProfile(Map<String, dynamic> body,
+      {Map<String, dynamic>? file}) async {
     String url = "${DefaultService.envUrl}/profile/edit";
+
     try {
       var request = http.MultipartRequest(
         "put",
         Uri.parse(url),
       );
-      Map<String, String> headers = {
-        "Content-Type": "multipart/form-data",
-        "Access-Control-Allow-Origin": "*", // Required for CORS support to work
-        "Access-Control-Allow-Methods": "GET, PUT, DELETE, POST, OPTIONS",
-      };
-      request.headers.addAll(headers);
 
       if (body.isNotEmpty) {
-        request.fields.addAll(body as Map<String, String>);
+        Map<String, String> data = body.map(
+            (key, value) => MapEntry<String, String>(key, value.toString()));
+
+        request.fields.addAll(data);
       }
 
       if (file != null && file.isNotEmpty) {
@@ -76,18 +74,123 @@ class UserService extends DefaultService {
       }
     } catch (e) {
       return APIResponse(
-          status: 500,
-          message: "Error while trying to make login on our services");
+          status: 500, message: "Error while trying to update profile");
     }
   }
 
   Future<void> setAppVersion(Map<String, dynamic> body) async {
     String url = "${DefaultService.envUrl}/configuration/appversion/";
-    
   }
 
   Future<APIResponse> getAppVersion(String userId) async {
     String url = "${DefaultService.envUrl}/configuration/appversion/$userId";
     return APIResponse();
+  }
+
+  Future<APIResponse> deleteAccount(String userId) async {
+    String url = "${DefaultService.envUrl}/delete/$userId";
+    try {
+      final response = await delete(url);
+      if (response.statusCode >= 200 && response.statusCode <= 299) {
+        final parsedResponse = parseResponse(response);
+        return APIResponse(
+          result: parsedResponse.result,
+          status: parsedResponse.status,
+        );
+      } else {
+        final parsedReponse = parseResponse(response);
+        return APIResponse(
+          message: parsedReponse.message,
+          status: parsedReponse.status,
+          result: [],
+        );
+      }
+    } catch (e) {
+      return APIResponse(
+          status: 500, message: "Error while trying to delete profile!");
+    }
+  }
+
+  Future<APIResponse> followUser(Map<String, dynamic> body) async {
+    String url = "${DefaultService.envUrl}/profile/follow";
+    try {
+      final response = await put(url, body: body);
+      if (response.statusCode >= 200 && response.statusCode <= 299) {
+        final parsedResponse = parseResponse(response);
+        return APIResponse(
+          result: parsedResponse.result,
+          status: parsedResponse.status,
+        );
+      } else {
+        final parsedReponse = parseResponse(response);
+        return APIResponse(
+          message: parsedReponse.message,
+          status: parsedReponse.status,
+          result: [],
+        );
+      }
+    } catch (e) {
+      return APIResponse(
+          status: 500, message: "Error while trying to follow profile!");
+    }
+  }
+
+  Future<APIResponse> unfollowUser(Map<String, dynamic> body) async {
+    String url = "${DefaultService.envUrl}/profile/unfollow";
+
+    try {
+      final response = await put(url, body: body);
+      if (response.statusCode >= 200 && response.statusCode <= 299) {
+        final parsedResponse = parseResponse(response);
+        return APIResponse(
+          result: parsedResponse.result,
+          status: parsedResponse.status,
+        );
+      } else {
+        final parsedReponse = parseResponse(response);
+        return APIResponse(
+          message: parsedReponse.message,
+          status: parsedReponse.status,
+          result: [],
+        );
+      }
+    } catch (e) {
+      return APIResponse(
+          status: 500, message: "Error while trying to unfollow profile!");
+    }
+  }
+
+  Future<APIResponse> findUsersByUsername(String username) async {
+    String url = "${DefaultService.envUrl}/search/$username";
+
+    try {
+      final response = await get(url);
+      if (username.isEmpty) {
+        return APIResponse(
+          message: "Not Found!",
+          status: 404,
+          result: [],
+        );
+      }
+
+      if (response.statusCode >= 200 && response.statusCode <= 299) {
+        final parsedResponse = parseResponse(response);
+        return APIResponse(
+          result: parsedResponse.result,
+          status: parsedResponse.status,
+        );
+      } else {
+        final parsedReponse = parseResponse(response);
+        return APIResponse(
+          message: parsedReponse.message,
+          status: parsedReponse.status,
+          result: [],
+        );
+      }
+    } catch (e) {
+      print(e);
+      return APIResponse(
+          status: 500, message: "Error while trying to searching profile!");
+    }
   }
 }

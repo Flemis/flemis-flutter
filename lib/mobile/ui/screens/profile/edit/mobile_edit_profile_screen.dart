@@ -42,13 +42,16 @@ class _MobileEditProfileScreenState extends State<MobileEditProfileScreen> {
         actions: [
           TextButton(
             onPressed: () async => await accountController?.updateProfile({
-              "id": manager!.user?.id,
-              "username": accountController!.userNameController?.text,
-              "email": accountController!.newEmailController?.text,
-              "firstname": accountController!.firstNameController?.text,
-              "lastname": accountController!.lastNameController!.text,
-              "bio": accountController!.userBioController?.text,
-              "birthday": accountController?.birthdayController?.text
+              "userId": manager!.user!.id!.toString(),
+              "username":
+                  accountController?.userNameController?.text.toString(),
+              "email": accountController?.newEmailController?.text.toString(),
+              "firstname":
+                  accountController?.firstNameController?.text.toString(),
+              "lastname":
+                  accountController?.lastNameController!.text.toString(),
+              "bio": accountController?.userBioController?.text.toString(),
+              "birthday": accountController?.birthdayController?.text.toString()
             }),
             child: const Text(
               "Done",
@@ -86,181 +89,7 @@ class _MobileEditProfileScreenState extends State<MobileEditProfileScreen> {
                   ),
                 ),
               ),
-              SizedBox(
-                width: screenSize.width,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20.0, top: 15),
-                      child: Text("Username", style: secondaryFontStyle[2]),
-                    ),
-                    Flexible(
-                      child: SizedBox(
-                        width: screenSize.width * 0.65,
-                        child: TextFormField(
-                          controller: accountController?.userNameController,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(),
-                  ],
-                ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              SizedBox(
-                width: screenSize.width,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20.0, top: 15),
-                      child: Text("Firstname", style: secondaryFontStyle[2]),
-                    ),
-                    Flexible(
-                      child: SizedBox(
-                        width: screenSize.width * 0.65,
-                        child: TextFormField(
-                          controller: accountController?.firstNameController,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(),
-                  ],
-                ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              SizedBox(
-                width: screenSize.width,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20.0, top: 15),
-                      child: Text("Lastname", style: secondaryFontStyle[2]),
-                    ),
-                    Flexible(
-                      child: SizedBox(
-                        width: screenSize.width * 0.65,
-                        child: TextFormField(
-                          controller: accountController?.lastNameController,
-                        ),
-                      ),
-                    ),
-                    const SizedBox()
-                  ],
-                ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              SizedBox(
-                width: screenSize.width,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      width: screenSize.width * 0.23,
-                      alignment: Alignment.center,
-                      padding: const EdgeInsets.only(left: 20, top: 15),
-                      child: Text(
-                        "Bio",
-                        textAlign: TextAlign.center,
-                        style: secondaryFontStyle[2],
-                      ),
-                    ),
-                    Flexible(
-                      child: SizedBox(
-                        width: screenSize.width * 0.65,
-                        child: TextFormField(
-                          controller: accountController?.userBioController,
-                        ),
-                      ),
-                    ),
-                    const SizedBox()
-                  ],
-                ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              SizedBox(
-                width: screenSize.width,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      width: screenSize.width * 0.23,
-                      alignment: Alignment.center,
-                      padding: const EdgeInsets.only(left: 20, top: 15),
-                      child: Text(
-                        "Email",
-                        textAlign: TextAlign.center,
-                        style: secondaryFontStyle[2],
-                      ),
-                    ),
-                    Flexible(
-                      child: SizedBox(
-                        width: screenSize.width * 0.65,
-                        child: TextFormField(
-                          controller: accountController?.newEmailController,
-                        ),
-                      ),
-                    ),
-                    const SizedBox()
-                  ],
-                ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              SizedBox(
-                width: screenSize.width,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      width: screenSize.width * 0.23,
-                      alignment: Alignment.center,
-                      padding: const EdgeInsets.only(left: 20, ),
-                      child: Text(
-                        "Birthday",
-                        textAlign: TextAlign.center,
-                        style: secondaryFontStyle[2],
-                      ),
-                    ),
-                    Flexible(
-                      child: SizedBox(
-                        width: screenSize.width * 0.65,
-                        child: TextFormField(
-                          keyboardType: TextInputType.text,
-                          validator: (value) => Validators.isValidDate(value!),
-                          decoration: const InputDecoration(
-                            hintText: "month/date/year",
-                          ),
-                          inputFormatters: [
-                            FilteringTextInputFormatter.allow(
-                                RegExp(r'[0-9/]')),
-                            FilteringTextInputFormatter.deny(''),
-                            FilteringTextInputFormatter.deny(' '),
-                            FilteringTextInputFormatter.deny('  '),
-                            FilteringTextInputFormatter.deny('//'),
-                            FilteringTextInputFormatter.deny('///'),
-                            FilteringTextInputFormatter.deny('///'),
-                          ],
-                          maxLength: 10,
-                          controller: accountController?.birthdayController,
-                        ),
-                      ),
-                    ),
-                    const SizedBox()
-                  ],
-                ),
-              ),
+              _updateForms(screenSize),
             ],
           ),
         ),
@@ -294,6 +123,189 @@ class _MobileEditProfileScreenState extends State<MobileEditProfileScreen> {
               ).image,
               radius: 60,
             ),
+    );
+  }
+
+  Widget _updateForms(Size screenSize) {
+    return Column(
+      children: [
+        SizedBox(
+          width: screenSize.width,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 20.0, top: 15),
+                child: Text("Username", style: secondaryFontStyle[2]),
+              ),
+              Flexible(
+                child: SizedBox(
+                  width: screenSize.width * 0.65,
+                  child: TextFormField(
+                    controller: accountController?.userNameController,
+                  ),
+                ),
+              ),
+              const SizedBox(),
+            ],
+          ),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        SizedBox(
+          width: screenSize.width,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 20.0, top: 15),
+                child: Text("Firstname", style: secondaryFontStyle[2]),
+              ),
+              Flexible(
+                child: SizedBox(
+                  width: screenSize.width * 0.65,
+                  child: TextFormField(
+                    controller: accountController?.firstNameController,
+                  ),
+                ),
+              ),
+              const SizedBox(),
+            ],
+          ),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        SizedBox(
+          width: screenSize.width,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 20.0, top: 15),
+                child: Text("Lastname", style: secondaryFontStyle[2]),
+              ),
+              Flexible(
+                child: SizedBox(
+                  width: screenSize.width * 0.65,
+                  child: TextFormField(
+                    controller: accountController?.lastNameController,
+                  ),
+                ),
+              ),
+              const SizedBox()
+            ],
+          ),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        SizedBox(
+          width: screenSize.width,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                width: screenSize.width * 0.23,
+                alignment: Alignment.center,
+                padding: const EdgeInsets.only(left: 20, top: 15),
+                child: Text(
+                  "Bio",
+                  textAlign: TextAlign.center,
+                  style: secondaryFontStyle[2],
+                ),
+              ),
+              Flexible(
+                child: SizedBox(
+                  width: screenSize.width * 0.65,
+                  child: TextFormField(
+                    controller: accountController?.userBioController,
+                  ),
+                ),
+              ),
+              const SizedBox()
+            ],
+          ),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        SizedBox(
+          width: screenSize.width,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                width: screenSize.width * 0.23,
+                alignment: Alignment.center,
+                padding: const EdgeInsets.only(left: 20, top: 15),
+                child: Text(
+                  "Email",
+                  textAlign: TextAlign.center,
+                  style: secondaryFontStyle[2],
+                ),
+              ),
+              Flexible(
+                child: SizedBox(
+                  width: screenSize.width * 0.65,
+                  child: TextFormField(
+                    controller: accountController?.newEmailController,
+                  ),
+                ),
+              ),
+              const SizedBox()
+            ],
+          ),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        SizedBox(
+          width: screenSize.width,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                width: screenSize.width * 0.23,
+                alignment: Alignment.center,
+                padding: const EdgeInsets.only(
+                  left: 20,
+                ),
+                child: Text(
+                  "Birthday",
+                  textAlign: TextAlign.center,
+                  style: secondaryFontStyle[2],
+                ),
+              ),
+              Flexible(
+                child: SizedBox(
+                  width: screenSize.width * 0.65,
+                  child: TextFormField(
+                    keyboardType: TextInputType.text,
+                    validator: (value) => Validators.isValidDate(value!),
+                    decoration: const InputDecoration(
+                      hintText: "month/date/year",
+                    ),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'[0-9/]')),
+                      FilteringTextInputFormatter.deny(''),
+                      FilteringTextInputFormatter.deny(' '),
+                      FilteringTextInputFormatter.deny('  '),
+                      FilteringTextInputFormatter.deny('//'),
+                      FilteringTextInputFormatter.deny('///'),
+                      FilteringTextInputFormatter.deny('///'),
+                    ],
+                    maxLength: 10,
+                    controller: accountController?.birthdayController,
+                  ),
+                ),
+              ),
+              const SizedBox()
+            ],
+          ),
+        )
+      ],
     );
   }
 }

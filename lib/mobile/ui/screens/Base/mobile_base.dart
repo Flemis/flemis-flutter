@@ -6,6 +6,7 @@ import 'package:flemis/mobile/ui/screens/chat/chat_list_screen.dart';
 import 'package:flemis/mobile/ui/screens/explore/explore_screen.dart';
 import 'package:flemis/mobile/ui/screens/home/mobile_home.dart';
 import 'package:flemis/mobile/ui/screens/profile/profile_screen.dart';
+import 'package:flemis/mobile/utils/navigator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttericon/font_awesome5_icons.dart';
@@ -26,6 +27,7 @@ class _MobileBaseState extends State<MobileBase> {
   List<Widget>? screens;
   Manager? manager;
   PageController? pageController;
+  AppNavigator? navigator;
 
   @override
   void initState() {
@@ -34,8 +36,11 @@ class _MobileBaseState extends State<MobileBase> {
       const ExploreScreen(),
       const MobileHome(),
       const MobileHome(),
-      const ProfileScreen(),
+      const ProfileScreen(
+        isYourProfile: true,
+      ),
     ];
+    navigator = AppNavigator(context: context);
     super.initState();
   }
 
@@ -182,8 +187,7 @@ class _MobileBaseState extends State<MobileBase> {
                           color: secondaryColor,
                           size: 30,
                         ),
-                        label: ""),
-                    BottomNavigationBarItem(
+                        label: ""),                    BottomNavigationBarItem(
                         icon: Icon(
                           FontAwesomeIcons.house,
                           color: whiteColor,
@@ -227,11 +231,12 @@ class _MobileBaseState extends State<MobileBase> {
       floatingActionButton: manager?.currentPage.value == 2
           ? FloatingActionButton(
               backgroundColor: secondaryColor,
-              onPressed: () => Navigator.of(context).push(
+              /* onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) => const CameraScreen(),
                 ),
-              ),
+              ), */
+              onPressed: () => navigator?.goToCreatePost(),
               child: const FaIcon(
                 FontAwesome5.plus,
                 size: 25,

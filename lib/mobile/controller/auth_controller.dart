@@ -18,11 +18,10 @@ class AuthController {
   TextEditingController lastNameController = TextEditingController(text: "");
   TextEditingController firstNameController = TextEditingController(text: "");
   UserRepository userRepository = UserRepository();
-  
+
   Future<void> login(String username, String password) async {
     AppNavigator navigator = AppNavigator(context: context!);
     Manager manager = context!.read<Manager>();
-
     LoadingAlert.showAlert(context!);
     final serviceResponse =
         await authService.login({"username": username, "password": password});

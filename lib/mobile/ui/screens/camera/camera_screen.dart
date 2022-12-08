@@ -149,7 +149,7 @@ class _CameraScreenState extends State<CameraScreen>
     }
   }
 
-  Future<void> takePicture() async {
+  Future<void> takePicture(CameraType selectedType) async {
     final CameraController cameraController = controller;
 
     if (cameraController.value.isTakingPicture) {
@@ -748,7 +748,7 @@ class _CameraScreenState extends State<CameraScreen>
                                           await startVideoRecording(),
                                       onTap: !value
                                           ? () async {
-                                              await takePicture();
+                                              await takePicture(selectedValue);
                                             }
                                           : () async {
                                               await stopVideoRecording();
@@ -802,7 +802,7 @@ class _CameraScreenState extends State<CameraScreen>
                                     color: Colors.black,
                                     borderRadius: BorderRadius.circular(10.0),
                                     border: Border.all(
-                                      color: Colors.green,
+                                      color: whiteColor,
                                       width: 2,
                                     ),
                                     image: _imageFile != null
@@ -846,31 +846,37 @@ class _CameraScreenState extends State<CameraScreen>
   Widget _chooseMenu(Size screenSize, List<CameraType> menu,
       ValueNotifier<CameraType> selectType) {
     return Container(
-      margin: EdgeInsets.only(bottom: Platform.isIOS ? 20 : 0),
+      margin: EdgeInsets.only(bottom: Platform.isIOS ? 30 : 0),
       decoration: BoxDecoration(
         color: Colors.grey[700]?.withOpacity(0.9),
         borderRadius: BorderRadius.circular(20),
       ),
       height: 40,
-      width: screenSize.width * 0.65,
+      width: screenSize.width * 0.7,
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: menu
             .map(
-              (selectItem) => InkWell(
-                onTap: () async => selectType.value = selectItem,
-                child: Container(
-                  margin: const EdgeInsets.only(
-                    left: 10,
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 5),
-                  child: Text(
-                    selectItem.name.toUpperCase(),
-                    style: TextStyle(
-                      color: menu.indexOf(selectItem) == selectType.value.index
-                          ? Colors.yellow
-                          : null,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
+              (selectItem) => Flexible(
+                child: InkWell(
+                  onTap: () async => selectType.value = selectItem,
+                  child: Container(
+                    margin: menu.indexOf(selectItem) == 0
+                        ? const EdgeInsets.only(
+                            left: 10,
+                          )
+                        : null,
+                    padding: const EdgeInsets.symmetric(horizontal: 5),
+                    child: Text(
+                      selectItem.name.toUpperCase(),
+                      style: TextStyle(
+                        color:
+                            menu.indexOf(selectItem) == selectType.value.index
+                                ? Colors.yellow
+                                : null,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                 ),

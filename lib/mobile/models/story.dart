@@ -10,7 +10,7 @@ class Story {
   String? mediaUrl;
   Duration? duration;
   User? author;
-  List<String>? viewdBy;
+  List<String>? viewedBy;
   List<Widget>? storyWidgets;
   MediaType? mediaType;
 }

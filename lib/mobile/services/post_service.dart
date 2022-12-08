@@ -1,12 +1,41 @@
 import 'package:flemis/mobile/models/api_response.dart';
 import 'package:flemis/mobile/services/default_service.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 
+import '../models/post.dart';
+
 class PostService extends DefaultService {
-  Future<APIResponse> fetchFeed(String userId) async {
-    String url = "${DefaultService.envUrl}/posts/$userId";
+  Future<APIResponse> fetchFeed(Map<String, dynamic> body) async {
+    String url = "${DefaultService.envUrl}/posts/following";
+    try {
+      final response = await super.post(url, body: body);
+      if (response.statusCode >= 200 && response.statusCode <= 299) {
+        final parsedResponse = parseResponse(response);
+
+        return APIResponse(
+            status: parsedResponse.status, result: parsedResponse.result);
+      } else {
+        final parsedResponse = parseResponse(response);
+        return APIResponse(
+          status: parsedResponse.status,
+          message: parsedResponse.message,
+          result: [],
+        );
+      }
+      // ignore: empty_catches
+    } catch (e) {
+      return APIResponse(
+        status: 500,
+        message: "Error while trying to load your feed. Please, try again!",
+      );
+    }
+  }
+
+  Future<APIResponse> fetchRandom() async {
+    String url = "${DefaultService.envUrl}/posts/random";
     try {
       final response = await super.get(url);
       if (response.statusCode >= 200 && response.statusCode <= 299) {
@@ -31,22 +60,18 @@ class PostService extends DefaultService {
     }
   }
 
-  Future<dynamic> createPost(post, Map<String, dynamic>? file) async {
-    String url = "${DefaultService.envUrl}/posts/create";
+  Future<dynamic> createPost(Post post, Map<String, dynamic>? file) async {
+    String url = "${DefaultService.envUrl}/post/create";
     try {
       var request = http.MultipartRequest(
         "POST",
         Uri.parse(url),
       );
-      Map<String, String> headers = {
-        "Content-Type": "multipart/form-data",
-        "Access-Control-Allow-Origin": "*", // Required for CORS support to work
-        "Access-Control-Allow-Methods": "GET, PUT, DELETE, POST, OPTIONS",
-      };
-      request.headers.addAll(headers);
 
-      if (post.toJsonV2().isNotEmpty) {
-        request.fields.addAll(post.toJsonV2());
+      if (post.toJson().isNotEmpty) {
+        Map<String, String> data = post.toMap().map(
+            (key, value) => MapEntry<String, String>(key, value.toString()));
+        request.fields.addAll(data);
       }
 
       if (file != null && file.isNotEmpty) {
@@ -65,10 +90,128 @@ class PostService extends DefaultService {
       }
 
       final response = await super.multiPartForm(url, request);
+      if (response.statusCode >= 200 && response.statusCode <= 299) {
+        final parsedResponse = parseResponse(response);
+        return APIResponse(
+          result: parsedResponse.result,
+          status: parsedResponse.status,
+        );
+      } else {
+        final parsedReponse = parseResponse(response);
+        return APIResponse(
+          message: parsedReponse.message,
+          status: parsedReponse.status,
+          result: [],
+        );
+      }
     } catch (e) {
       return APIResponse(
         status: 500,
         message: "Error while trying to create post!",
+      );
+    }
+  }
+
+  Future<dynamic> likePost(Map<String, dynamic> body) async {
+    String url = "${DefaultService.envUrl}/post/like";
+    try {
+      final response = await super.put(url, body: body);
+      if (response.statusCode >= 200 && response.statusCode <= 299) {
+        final parsedResponse = parseResponse(response);
+
+        return APIResponse(
+            status: parsedResponse.status, result: parsedResponse.result);
+      } else {
+        final parsedResponse = parseResponse(response);
+        return APIResponse(
+          status: parsedResponse.status,
+          message: parsedResponse.message,
+          result: [],
+        );
+      }
+      // ignore: empty_catches
+    } catch (e) {
+      return APIResponse(
+        status: 500,
+        message: "Error while trying to like this post. Please, try again!",
+      );
+    }
+  }
+
+  Future<dynamic> unlikePost(Map<String, dynamic> body) async {
+    String url = "${DefaultService.envUrl}/post/unlike";
+    try {
+      final response = await super.put(url, body: body);
+      if (response.statusCode >= 200 && response.statusCode <= 299) {
+        final parsedResponse = parseResponse(response);
+
+        return APIResponse(
+            status: parsedResponse.status, result: parsedResponse.result);
+      } else {
+        final parsedResponse = parseResponse(response);
+        return APIResponse(
+          status: parsedResponse.status,
+          message: parsedResponse.message,
+          result: [],
+        );
+      }
+      // ignore: empty_catches
+    } catch (e) {
+      return APIResponse(
+        status: 500,
+        message: "Error while trying to like this post. Please, try again!",
+      );
+    }
+  }
+
+  Future<APIResponse> addComment(Map<String, dynamic> body) async {
+    String url = "${DefaultService.envUrl}/post/add/comment";
+    try {
+      final response = await super.put(url, body: body);
+      if (response.statusCode >= 200 && response.statusCode <= 299) {
+        final parsedResponse = parseResponse(response);
+
+        return APIResponse(
+            status: parsedResponse.status, result: parsedResponse.result);
+      } else {
+        final parsedResponse = parseResponse(response);
+        return APIResponse(
+          status: parsedResponse.status,
+          message: parsedResponse.message,
+          result: [],
+        );
+      }
+      // ignore: empty_catches
+    } catch (e) {
+      return APIResponse(
+        status: 500,
+        message: "Error while trying add coment to post. Please, try again!",
+      );
+    }
+  }
+
+  Future<APIResponse> deleteComment(Map<String, dynamic> body) async {
+    String url = "${DefaultService.envUrl}/post/add/comment";
+    try {
+      final response = await super.put(url, body: body);
+      if (response.statusCode >= 200 && response.statusCode <= 299) {
+        final parsedResponse = parseResponse(response);
+
+        return APIResponse(
+            status: parsedResponse.status, result: parsedResponse.result);
+      } else {
+        final parsedResponse = parseResponse(response);
+        return APIResponse(
+          status: parsedResponse.status,
+          message: parsedResponse.message,
+          result: [],
+        );
+      }
+      // ignore: empty_catches
+    } catch (e) {
+      return APIResponse(
+        status: 500,
+        message: "Error while trying add coment to post. Please, try again!",
       );
     }
   }

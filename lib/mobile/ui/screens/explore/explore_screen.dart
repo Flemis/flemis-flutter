@@ -1,15 +1,22 @@
+import 'dart:async';
 import 'dart:io';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flemis/mobile/controller/post_controller.dart';
+import 'package:flemis/mobile/models/post.dart';
 import 'package:flemis/mobile/my_app_mobile.dart';
 import 'package:flemis/mobile/ui/widgets/components/chat/chat_list_item.dart';
+import 'package:flemis/mobile/ui/widgets/components/post/custom_post_card.dart';
 import 'package:flemis/mobile/ui/widgets/components/search/custom_search_delegate.dart';
 import 'package:flemis/mobile/ui/widgets/components/loading/loading.dart';
+import 'package:flemis/mobile/utils/navigator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:fluttericon/font_awesome5_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
+import '../../../models/chat.dart';
 import '../../../providers/manager.dart';
 
 class ExploreScreen extends StatefulWidget {
@@ -23,29 +30,40 @@ class _ExploreScreenState extends State<ExploreScreen> {
   PostController? postController;
   final ValueNotifier<bool> resetCache = ValueNotifier<bool>(false);
   Manager? manager;
+  AppNavigator? appNavigator;
+  final analytics = FirebaseAnalytics.instance;
 
+  Future? _future;
   Future<void> _showSearch() async {
     await showSearch(
       context: context,
       delegate: CustomSearchDelegate(),
-      query: "any query",
+      query: "",
     );
   }
 
   @override
   void initState() {
-    super.initState();
+    appNavigator = AppNavigator(context: context);
     postController = PostController(context: context);
     manager = context.read<Manager>();
+    super.initState();
+    _future = postController?.randomPosts();
   }
 
   @override
-  void didChangeDependencies() {
+  void didChangeDependencies() async {
     super.didChangeDependencies();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   Future onRefresh() async {
     resetCache.value = !resetCache.value;
+    _future = postController?.randomPosts();
     return;
   }
 
@@ -75,8 +93,11 @@ class _ExploreScreenState extends State<ExploreScreen> {
                     ),
                     Expanded(
                       child: Text(
-                        "Fernandosini",
-                        style: primaryFontStyle[4],
+                        manager!.user!.username!.length >= 15
+                            ? manager!.user!.username!.replaceRange(
+                                15, manager!.user!.username!.length, "...")
+                            : manager!.user!.username! ?? "",
+                        style: primaryFontStyle[7],
                       ),
                     ),
                   ],
@@ -96,8 +117,11 @@ class _ExploreScreenState extends State<ExploreScreen> {
                     ),
                     Expanded(
                       child: Text(
-                        "Fernandosini",
-                        style: primaryFontStyle[4],
+                        manager!.user!.username!.length >= 15
+                            ? manager!.user!.username!.replaceRange(
+                                15, manager!.user!.username!.length, "...")
+                            : manager!.user!.username! ?? "",
+                        style: primaryFontStyle[7],
                       ),
                     ),
                   ],
@@ -164,31 +188,79 @@ class _ExploreScreenState extends State<ExploreScreen> {
               backgroundColor: primaryColor,
               color: secondaryColor,
               child: FutureBuilder(
-                future: postController?.getFeed(manager!.user!.id!),
+                future: _future,
                 builder: (context, AsyncSnapshot snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Loading(context: context);
                   }
                   if (snapshot.hasData || snapshot.data != null) {
-                    List<dynamic> data = snapshot.data;
-                    return SingleChildScrollView(
-                      physics: const BouncingScrollPhysics(
-                        parent: AlwaysScrollableScrollPhysics(),
-                      ),
-                      child: Column(
-                        children: data
-                            .map((e) => ChatListItem(
-                                  element: e.toString(),
-                                ))
-                            .toList(),
+                    List<Post> data = snapshot.data;
+
+                    return SizedBox(
+                      height: screenSize.height,
+                      width: screenSize.width,
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.only(bottom: 100),
+                        physics: const BouncingScrollPhysics(
+                          parent: AlwaysScrollableScrollPhysics(),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: data
+                              .map(
+                                (e) => Center(
+                                  child: CustomPostCard(
+                                    post: e,
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                        ),
                       ),
                     );
                   }
-                  return Container();
+                  return errorWidget(screenSize, snapshot);
                 },
               ),
             );
           },
+        ),
+      ),
+    );
+  }
+
+  Widget errorWidget(Size screenSize, AsyncSnapshot data) {
+    return AnimationConfiguration.staggeredList(
+      position: 0,
+      child: FadeInAnimation(
+        duration: const Duration(seconds: 2),
+        curve: Curves.ease,
+        child: SizedBox(
+          height: screenSize.height,
+          width: screenSize.width,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.only(
+              top: 0,
+            ),
+            physics: const BouncingScrollPhysics(
+              parent: AlwaysScrollableScrollPhysics(),
+            ),
+            child: SizedBox(
+              height: screenSize.height * 0.7,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20, right: 20),
+                    child: Text(
+                      data.error != null ? data.error.toString() : "no data",
+                      style: const TextStyle(color: whiteColor),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );

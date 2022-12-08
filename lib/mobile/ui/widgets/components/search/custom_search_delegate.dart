@@ -1,5 +1,11 @@
+import 'package:flemis/mobile/controller/user_controller.dart';
 import 'package:flemis/mobile/my_app_mobile.dart';
+import 'package:flemis/mobile/ui/widgets/components/loading/loading.dart';
+import 'package:flemis/mobile/utils/navigator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+
+import '../../../../models/user.dart';
 
 class CustomSearchDelegate extends SearchDelegate {
   @override
@@ -68,19 +74,132 @@ class CustomSearchDelegate extends SearchDelegate {
 
   @override
   Widget buildResults(BuildContext context) {
-  
-    throw UnimplementedError();
+    AppNavigator navigator = AppNavigator(context: context);
+    var screenSize = MediaQuery.of(context).size;
+    //final suggestions = query.isEmpty ? [] : [];
+    UserController userController = UserController(context: context);
+    Future _future = userController.findUsersByUsername(query);
+    return Container(
+      color: primaryColor,
+      child: FutureBuilder(
+        future: _future,
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Loading(context: context);
+          }
+          if (snapshot.hasData && snapshot.data != null) {
+            List<User> users = snapshot.data;
+            return ListView.builder(
+                itemCount: users.length,
+                padding: const EdgeInsets.only(top: 20),
+                itemBuilder: (context, index) =>
+                    _userItem(users, index, context, navigator));
+          }
+          return errorWidget(screenSize, snapshot);
+        },
+      ),
+    );
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    final suggestions = query.isEmpty ? [] : [];
+    AppNavigator navigator = AppNavigator(context: context);
+    var screenSize = MediaQuery.of(context).size;
+    //final suggestions = query.isEmpty ? [] : [];
+    UserController userController = UserController(context: context);
+    Future _future = userController.findUsersByUsername(query);
     return Container(
       color: primaryColor,
-      child: ListView.builder(
-        itemCount: suggestions.length,
-        itemBuilder: (content, index) => ListTile(
-            leading: const Icon(Icons.arrow_left), title: Text(suggestions[index])),
+      child: FutureBuilder(
+        future: _future,
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Loading(context: context);
+          }
+
+          if (snapshot.hasData && snapshot.data != null) {
+            List<User> users = snapshot.data;
+            return ListView.builder(
+                itemCount: users.length,
+                padding: const EdgeInsets.only(top: 20),
+                itemBuilder: (context, index) =>
+                    _userItem(users, index, context, navigator));
+          }
+          return errorWidget(screenSize, snapshot);
+        },
+      ),
+    );
+  }
+
+  Widget errorWidget(Size screenSize, AsyncSnapshot data) {
+    return AnimationConfiguration.staggeredList(
+      position: 0,
+      child: FadeInAnimation(
+        duration: const Duration(seconds: 2),
+        curve: Curves.ease,
+        child: SizedBox(
+          height: screenSize.height,
+          width: screenSize.width,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.only(
+              top: 0,
+            ),
+            physics: const BouncingScrollPhysics(
+              parent: AlwaysScrollableScrollPhysics(),
+            ),
+            child: SizedBox(
+              height: screenSize.height * 0.7,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20, right: 20),
+                    child: Text(
+                      data.error != null ? data.error.toString() : "no data",
+                      style: const TextStyle(color: whiteColor),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _userItem(List<User> users, int index, BuildContext context,
+      AppNavigator navigator) {
+    return InkWell(
+      onTap: () => navigator.goToProfile(
+        isYourProfile: false,
+        user: users[index],
+      ),
+      child: ListTile(
+        leading: users[index].avatarUrl != null &&
+                users[index].avatarUrl!.isNotEmpty
+            ? CircleAvatar(
+                backgroundImage: Image.network(
+                  users[index].avatarUrl!,
+                  loadingBuilder: (context, child, loadingProgress) => Loading(
+                    context: context,
+                  ),
+                  errorBuilder: (context, error, stackTrace) =>
+                      Image.asset("./assets/avatar.png"),
+                  fit: BoxFit.cover,
+                ).image,
+                radius: 30,
+              )
+            : CircleAvatar(
+                backgroundImage: Image.asset(
+                  "./assets/avatar.png",
+                  errorBuilder: (context, error, stackTrace) =>
+                      Image.asset("./assets/avatar.png"),
+                  fit: BoxFit.cover,
+                ).image,
+                radius: 30,
+              ),
+        title: Text(users[index].username!),
       ),
     );
   }
