@@ -35,8 +35,10 @@ class _MobileEditProfileScreenState extends State<MobileEditProfileScreen> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
-        title: const Text(
+        title: Text(
           "Edit profile",
+          //a fonte default é sem esse fontstyle
+          style: primaryFontStyle[7],
         ),
         centerTitle: true,
         actions: [
@@ -63,7 +65,7 @@ class _MobileEditProfileScreenState extends State<MobileEditProfileScreen> {
           )
         ],
       ),
-      backgroundColor: tertiaryColor,
+      backgroundColor: primaryColor,
       body: SizedBox(
         height: screenSize.height,
         width: screenSize.width,

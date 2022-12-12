@@ -157,7 +157,9 @@ class _PostScreenState extends State<PostScreen> {
       children: [
         InkWell(
           onTap: () => appNavigator?.goToProfile(
-              isYourProfile: user.id != manager?.user?.id, isAnimated: true),
+              isYourProfile: user.id != manager?.user?.id,
+              isAnimated: true,
+              user: user),
           child: Row(
             children: [
               Container(
@@ -248,7 +250,7 @@ class _PostScreenState extends State<PostScreen> {
                             await _postController?.likePost(
                               {
                                 "postId": postNotifier.value!.id,
-                                "user": manager!.user?.toJson(),
+                                "user": manager!.user?.toMap(),
                                 "userNotified": postNotifier.value!.postedBy
                               },
                             );
@@ -260,7 +262,7 @@ class _PostScreenState extends State<PostScreen> {
                             await _postController?.unlikePost(
                               {
                                 "postId": postNotifier.value!.id,
-                                "user": manager!.user?.toJson(),
+                                "user": manager!.user?.toMap(),
                               },
                             );
                           },

@@ -391,28 +391,30 @@ class _CustomPostCardState extends State<CustomPostCard> {
                                                     element.id ==
                                                     manager!.user!.id!)
                                         ? () async {
-                                            await postController?.likePost(
-                                              {
-                                                "postId": notifier.value?.id,
-                                                "userId": manager!.user?.id,
-                                              },
-                                            );
                                             notifier.value!.likedBy
                                                 ?.add(manager!.user!);
                                             notifier.notifyListeners();
-                                          }
-                                        : () async {
-                                            await postController?.unlikePost(
+                                            await postController?.likePost(
                                               {
                                                 "postId": notifier.value?.id,
-                                                "userId": manager!.user?.id,
+                                                "user": manager!.user?.toMap(),
+                                                "userNotified":
+                                                    notifier.value!.postedBy
                                               },
                                             );
+                                          }
+                                        : () async {
                                             notifier.value!.likedBy
                                                 ?.removeWhere((element) =>
                                                     element.id ==
                                                     manager?.user!.id);
                                             notifier.notifyListeners();
+                                            await postController?.unlikePost(
+                                              {
+                                                "postId": notifier.value?.id,
+                                                "user": manager!.user?.toMap(),
+                                              },
+                                            );
                                           },
                                   );
                                 }),

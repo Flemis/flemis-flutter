@@ -273,23 +273,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             shape: const CircleBorder(),
                           ),
                           child: const Icon(
-                            Icons.edit,
-                            size: 25,
-                            color: whiteColor,
-                          ),
-                          onPressed: () async =>
-                              navigator?.goToEditProfile(user: manager!.user),
-                        ),
-                      ),
-                      Container(
-                        margin: const EdgeInsets.only(top: 30),
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            fixedSize: const Size.fromHeight(40),
-                            backgroundColor: primaryColor,
-                            shape: const CircleBorder(),
-                          ),
-                          child: const Icon(
                             Icons.settings,
                             size: 25,
                             color: whiteColor,
@@ -308,23 +291,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   Row(
                     children: [
-                      Container(
-                        margin: const EdgeInsets.only(top: 10),
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            fixedSize: const Size.fromHeight(40),
-                            backgroundColor: primaryColor,
-                            shape: const CircleBorder(),
-                          ),
-                          child: const Icon(
-                            Icons.edit,
-                            size: 25,
-                            color: whiteColor,
-                          ),
-                          onPressed: () async =>
-                              navigator?.goToEditProfile(user: manager!.user),
-                        ),
-                      ),
                       Container(
                         margin: const EdgeInsets.only(top: 10),
                         child: ElevatedButton(
@@ -406,13 +372,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         style: secondaryFontStyle[2],
                                       ),
                                     ),
-                                    Container(
-                                      padding: const EdgeInsets.only(top: 10),
-                                      child: Text(
-                                        user.bio != null ? user.bio! : user.id!,
-                                        style: secondaryFontStyle[3],
+                                    if ((widget.isYourProfile &&
+                                            widget.user == null) ||
+                                        manager?.currentPage.value == 4)
+                                      Column(
+                                        children: [
+                                          TextButton(
+                                            child: const Text(
+                                              "Edit profile",
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                              ),
+                                            ),
+                                            onPressed: () async =>
+                                                navigator?.goToEditProfile(
+                                                    user: manager!.user),
+                                          ),
+                                          Container(
+                                            padding:
+                                                const EdgeInsets.only(top: 5),
+                                            child: Text(
+                                              user.bio != null
+                                                  ? user.bio!
+                                                  : user.id!,
+                                              style: secondaryFontStyle[3],
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    else
+                                      Container(
+                                        padding: const EdgeInsets.only(top: 10),
+                                        child: Text(
+                                          user.bio != null
+                                              ? user.bio!
+                                              : user.id!,
+                                          style: secondaryFontStyle[3],
+                                        ),
                                       ),
-                                    ),
                                     _infoCard(screenSize, notifierUser),
                                     //  _memories(screenSize, user),
                                   ],
@@ -447,6 +444,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _avatarWidget(BuildContext context, Size screenSize,
       ValueNotifier<User> notifier, bool isYourProfile) {
     return InkWell(
+      borderRadius: BorderRadius.circular(50),
+      hoverColor: Colors.transparent,
+      splashColor: Colors.transparent,
+      focusColor: Colors.transparent,
+      highlightColor: Colors.transparent,
       onLongPress: () =>
           !isYourProfile ? null : _openAvatarMenu(context, screenSize),
       child: ValueListenableBuilder<User>(
@@ -585,7 +587,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget backgroundCoverGradient(Size screenSize) {
     return Container(
-      height: screenSize.height * 0.355,
+      height: screenSize.height * 0.305,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           stops: [0.0, 20.0],
@@ -602,7 +604,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget backgroundCover(Size screenSize, User user) {
     return Container(
-      height: screenSize.height * 0.35,
+      height: screenSize.height * 0.3,
       decoration: BoxDecoration(
         image: user.avatarUrl != null && user.avatarUrl!.isNotEmpty
             ? DecorationImage(

@@ -91,7 +91,8 @@ class _MobileHomeState extends State<MobileHome> {
                 ),
               )
             else
-              SizedBox(
+              Container(
+                margin: const EdgeInsets.only(top: 30),
                 height: screenSize.height * 0.12,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flemis/mobile/utils/navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
@@ -15,8 +17,10 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   PhotoViewController controller =
       PhotoViewController(initialPosition: Offset.zero, initialScale: 1);
   AppNavigator? navigator;
+  ValueNotifier<File?>? fileToUpload;
   @override
   void initState() {
+    fileToUpload = ValueNotifier<File?>(null);
     navigator = AppNavigator(context: context);
     super.initState();
   }
@@ -74,10 +78,19 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
           tightMode: true,
           minScale: PhotoViewComputedScale.contained,
           backgroundDecoration:
-              const BoxDecoration(color: primaryColor ?? darkColor),
-          child: Image.asset(
-            "./assets/fernando.jpg",
-          ),
+              const BoxDecoration(color: primaryColor ?? Colors.black),
+          child: ValueListenableBuilder<File?>(
+              valueListenable: fileToUpload!,
+              builder: (context, file, _) {
+                if (file == null) {
+                  return Container();
+                }
+                return Image.file(
+                  File.fromUri(
+                    Uri.file(file.path),
+                  ),
+                );
+              }),
         ),
       ),
     );
@@ -143,7 +156,8 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                   side: BorderSide(color: Colors.white, width: 0.5),
                 ),
               ),
-              onPressed: () => navigator?.goToCameraScreen(),
+              onPressed: () async =>
+                  fileToUpload?.value = await navigator?.goToCameraScreen(),
               child: const Icon(
                 Icons.camera_alt_outlined,
                 size: 20,

@@ -149,12 +149,12 @@ class _CameraScreenState extends State<CameraScreen>
     }
   }
 
-  Future<void> takePicture(CameraType selectedType) async {
+  Future<File?> takePicture(CameraType selectedType) async {
     final CameraController cameraController = controller;
 
     if (cameraController.value.isTakingPicture) {
       // A capture is already pending, do nothing.
-      return;
+      return null;
     }
 
     try {
@@ -177,12 +177,13 @@ class _CameraScreenState extends State<CameraScreen>
       _imageFile = await imageFile?.copy(
         '${directory.path}/$currentUnix.$fileFormat',
       );
-      Navigator.of(context).push(MaterialPageRoute(
+      /* Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => CreateStoryScreen(
                 file: _imageFile,
-              )));
+              ))); */
 
       refreshAlreadyCapturedImages();
+      return _imageFile;
     } on CameraException catch (e) {
       if (kDebugMode) {
         print('Error occured while taking picture: $e');
@@ -504,7 +505,7 @@ class _CameraScreenState extends State<CameraScreen>
                 size: 30,
                 color: whiteColor,
               ),
-              onPressed: () => Navigator.of(context).pop(true),
+              onPressed: () => Navigator.of(context).pop(),
             ),
           ],
         ),
@@ -748,7 +749,24 @@ class _CameraScreenState extends State<CameraScreen>
                                           await startVideoRecording(),
                                       onTap: !value
                                           ? () async {
-                                              await takePicture(selectedValue);
+                                              if (selectedValue.index ==
+                                                  CameraType.post.index) {
+                                                await takePicture(selectedValue)
+                                                    .then((value) =>
+                                                        Navigator.of(context)
+                                                            .pop(value));
+                                              }
+                                              if (selectedValue.index ==
+                                                  CameraType.stories.index) {
+                                                await takePicture(selectedValue)
+                                                    .then((value) => Navigator
+                                                            .of(context)
+                                                        .push(MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                CreateStoryScreen(
+                                                                    file:
+                                                                        value))));
+                                              }
                                             }
                                           : () async {
                                               await stopVideoRecording();

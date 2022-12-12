@@ -108,7 +108,7 @@ final darkTheme = ThemeData(
   primaryColorDark: Colors.black,
   backgroundColor: Colors.black,
 );
-const primaryColor = Color(0xff010773);
+const primaryColor = Colors.black ?? Color(0xff010773);
 const secondaryColor = Color(0xfffffc00);
 const tertiaryColor = Colors.black;
 const darkColor = Colors.black;
@@ -126,7 +126,7 @@ List<TextStyle> primaryFontStyle = <TextStyle>[
       fontFamily: GoogleFonts.mochiyPopOne().fontFamily),
   TextStyle(
       color: secondaryColor,
-      fontSize: 30,
+      fontSize: 25,
       fontFamily: GoogleFonts.mochiyPopOne().fontFamily),
   TextStyle(
       color: secondaryColor,

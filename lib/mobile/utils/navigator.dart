@@ -97,11 +97,11 @@ class AppNavigator {
 
   goToCreatePost() {
     // Navigator.of(context).pushNamed("/createPost");
-    customPageTransition(const CreatePostScreen());
+    return customPageTransition(const CreatePostScreen());
   }
 
-  goToCameraScreen() {
-    customPageTransition(const CameraScreen());
+  goToCameraScreen() async {
+    return await customPageTransition(const CameraScreen());
   }
 
   goToMessageScreen({Chat? chat, User? to}) {

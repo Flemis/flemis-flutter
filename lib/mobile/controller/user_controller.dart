@@ -78,7 +78,7 @@ class UserController {
       if (response.status >= 200 && response.status <= 299) {
         List<User> userList = [];
         response.result
-            .forEach((element) => userList.add(User.fromJson(element)));
+            .forEach((element) => userList.add(User.fromMap(element)));
         return userList;
       } else {
         return Future.error(response.message.toString());
