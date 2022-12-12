@@ -23,26 +23,33 @@ class AuthController {
     AppNavigator navigator = AppNavigator(context: context!);
     Manager manager = context!.read<Manager>();
     LoadingAlert.showAlert(context!);
-    final serviceResponse =
-        await authService.login({"username": username, "password": password});
-    LoadingAlert.close(context: context!);
+    await authService.login({
+      username.contains("@") && username.contains(".com")
+          ? "email"
+          : "username": username,
+      "password": password
+    }).catchError((error, stack) {
+      return error;
+    }).then((serviceResponse) async {
+      if (serviceResponse.status >= 200 && serviceResponse.status <= 299) {
+        userNameController.clear();
+        passwordController.clear();
+        manager.user = serviceResponse.result;
+        await userRepository.save(manager.user!);
+        LoadingAlert.close(context: context!);
+        navigator.goToBase();
+      } else {
+        userNameController.clear();
+        passwordController.clear();
+        LoadingAlert.close(context: context!);
+        ErrorAlert.showAlert(context!,
+            serviceResponse.message ?? "Error while trying to log in");
 
-    if (serviceResponse.status >= 200 && serviceResponse.status <= 299) {
-      userNameController.clear();
-      passwordController.clear();
-      manager.user = serviceResponse.result;
-      await userRepository.save(manager.user!);
-      navigator.goToBase();
-    } else {
-      userNameController.clear();
-      passwordController.clear();
-      ErrorAlert.showAlert(
-          context!, serviceResponse.message ?? "Error while trying to log in");
-
-      Future.delayed(const Duration(seconds: 2), () {
-        return ErrorAlert.close(context: context!);
-      });
-    }
+        Future.delayed(const Duration(seconds: 2), () {
+          return ErrorAlert.close(context: context!);
+        });
+      }
+    });
   }
 
   Future<void> register(Map<String, dynamic> body) async {
@@ -50,30 +57,32 @@ class AuthController {
     AppNavigator navigator = AppNavigator(context: context!);
 
     LoadingAlert.showAlert(context!);
-    final serviceResponse = await authService.register(body);
-    LoadingAlert.close(context: context!);
-
-    if (serviceResponse.status >= 200 && serviceResponse.status <= 299) {
-      userNameController.clear();
-      emailController.clear();
-      firstNameController.clear();
-      lastNameController.clear();
-      passwordController.clear();
-      manager.user = serviceResponse.result;
-      await userRepository.save(manager.user!);
-      navigator.goToBase();
-    } else {
-      userNameController.clear();
-      emailController.clear();
-      firstNameController.clear();
-      lastNameController.clear();
-      passwordController.clear();
-      ErrorAlert.showAlert(context!,
-          serviceResponse.message ?? "Error while trying to register");
-
-      Future.delayed(const Duration(seconds: 2), () {
-        return ErrorAlert.close(context: context!);
-      });
-    }
+    await authService.register(body).catchError((error, stack) {
+      return error;
+    }).then((serviceResponse) async {
+      if (serviceResponse.status >= 200 && serviceResponse.status <= 299) {
+        userNameController.clear();
+        emailController.clear();
+        firstNameController.clear();
+        lastNameController.clear();
+        passwordController.clear();
+        manager.user = serviceResponse.result;
+        await userRepository.save(manager.user!);
+        LoadingAlert.close(context: context!);
+        navigator.goToBase();
+      } else {
+        userNameController.clear();
+        emailController.clear();
+        firstNameController.clear();
+        lastNameController.clear();
+        passwordController.clear();
+        LoadingAlert.close(context: context!);
+        ErrorAlert.showAlert(context!,
+            serviceResponse.message ?? "Error while trying to register");
+        Future.delayed(const Duration(seconds: 2), () {
+          return ErrorAlert.close(context: context!);
+        });
+      }
+    });
   }
 }
