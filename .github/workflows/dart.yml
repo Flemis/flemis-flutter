@@ -104,5 +104,27 @@ jobs:
           git checkout -b app-production
           git add .
           git commit -m "update"
-          git push origin app-production -f      
+          git push origin app-production -f  
+      
+      - name: Build android apk
+        run: flutter build apk --release 
+      - uses: actions/upload-artifact@v1
+        with:
+           name: release-apk-test
+           path: build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Deploy apk to test
+        env:
+         SUPER_SECRET: ${{secrets.GITHUB_TOKEN}}
+        run: |
+          cd build/app/outputs/flutter-apk/
+          git init
+          git config --global user.email sinigagliafernando@gmail.com
+          git config --global user.name fernandosini
+          git remote add origin https://fernandosini:$SUPER_SECRET@github.com/fernandosini/flemis.git
+          git status
+          git checkout -b app-test
+          git add .
+          git commit -m "update"
+          git push origin app-test -f      
           
