@@ -49,7 +49,7 @@ class _CreatePostScreenFormsState extends State<CreatePostScreenForms> {
             onPressed: () async {
               await _postController?.createPost(
                   Post(
-                      postedBy: manager!.user!.id,
+                      postedBy: manager!.user!,
                       content: _postController?.contentController.text,
                       description: _postController?.descriptionController.text,
                       location: _postController?.locationController.text,

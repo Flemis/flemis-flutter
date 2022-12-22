@@ -41,9 +41,9 @@ class UserController {
     });
   }
 
-  Future<void> followUser(String yourId, String otherPersonId) async {
+  Future<void> followUser(User you, String otherPersonId) async {
     await _userService.followUser({
-      "yourId": yourId,
+      "you": you.toMapPost(),
       "otherPersonId": otherPersonId
     }).catchError((error, stack) {
       return error;
@@ -55,9 +55,9 @@ class UserController {
     });
   }
 
-  Future<void> unfollowUser(String yourId, String otherPersonId) async {
+  Future<void> unfollowUser(User you, String otherPersonId) async {
     await _userService.unfollowUser({
-      "yourId": yourId,
+      "you": you.toMapPost(),
       "otherPersonId": otherPersonId
     }).catchError((error, stack) {
       return error;

@@ -106,7 +106,30 @@ class User {
         "subscribers": subscribers?.toList(),
         "subscribed": subscribed?.toList(),
         "password": password,
-        "posts": posts?.map((e) => Post.fromMap(e.toMap())).toList().toString(),
+        "posts":
+            posts?.map((e) => Post.fromJson(e.toJson())).toList().toString(),
+        "createdAt": createdAt?.toIso8601String(),
+        "birthday": birthday,
+        "isBanned": isBanned,
+        "isProfilePrivate": isProfilePrivate,
+      };
+
+  //Specific map to create User json on Create post
+  Map<String, dynamic> toMapPost() => {
+        "_id": id,
+        "username": username,
+        "firstname": firstname,
+        "lastname": lastname,
+        "bio": bio,
+        "avatarUrl": avatarUrl,
+        "email": email,
+        "token": token,
+        "followers": followers?.toList(),
+        "following": following?.toList(),
+        "subscribers": subscribers?.toList(),
+        "subscribed": subscribed?.toList(),
+        "password": password,
+        "posts": posts?.map((e) => Post.fromMap(e.toMap())).toList(),
         "createdAt": createdAt?.toIso8601String(),
         "birthday": birthday,
         "isBanned": isBanned,

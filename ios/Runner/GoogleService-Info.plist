@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>201376969510-fgt91d2n25fap8fg5el7ssk65cvpvrb8.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.201376969510-fgt91d2n25fap8fg5el7ssk65cvpvrb8</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCC5jlTQc1zKSFMMqcAN9SVwc72NztIXrQ</string>
+	<key>GCM_SENDER_ID</key>
+	<string>201376969510</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.fernandosini.flemis</string>
+	<key>PROJECT_ID</key>
+	<string>flemis-80738</string>
+	<key>STORAGE_BUCKET</key>
+	<string>flemis-80738.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:201376969510:ios:fce4dd052d46ae8c3c07e7</string>
+</dict>
+</plist>

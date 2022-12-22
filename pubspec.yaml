@@ -47,6 +47,7 @@ dependencies:
   get: ^4.6.5
   get_it: ^7.2.0
   google_fonts: ^3.0.1
+  #google_mobile_ads: ^2.3.0
   http: ^0.13.4
   idb_shim: ^2.0.1+1
   image: ^3.2.2
@@ -94,6 +95,9 @@ flutter:
     #   - images/a_dot_ham.jpeg
     - assets/fernando.jpg
     - assets/avatar.png
+    - assets/sunsetphoto.jpeg
+    - assets/policies/privacy_policy_pt_br.txt
+    - assets/policies/privacy_policy_english.txt
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
   # For details regarding adding assets from package dependencies, see

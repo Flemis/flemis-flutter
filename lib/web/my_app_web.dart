@@ -1,3 +1,4 @@
+import 'package:flemis/web/ui/screens/landing/landing_screen.dart';
 import 'package:flutter/material.dart';
 
 class MyApp extends StatelessWidget {
@@ -12,6 +13,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       //home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: Landing(),
     );
   }
 }

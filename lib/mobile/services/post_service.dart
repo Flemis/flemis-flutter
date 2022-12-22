@@ -69,7 +69,7 @@ class PostService extends DefaultService {
       );
 
       if (post.toJson().isNotEmpty) {
-        Map<String, String> data = post.toMap().map(
+        Map<String, String> data = post.toMapCreate().map(
             (key, value) => MapEntry<String, String>(key, value.toString()));
         request.fields.addAll(data);
       }

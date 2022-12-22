@@ -102,10 +102,13 @@ class _MobileEditProfileScreenState extends State<MobileEditProfileScreen> {
   Widget _editAvatar() {
     return Container(
       margin: const EdgeInsets.only(top: 25),
+      height: 120,
+      width: 120,
       child: manager?.user?.avatarUrl != null &&
               manager!.user!.avatarUrl!.isNotEmpty
-          ? CircleAvatar(
-              backgroundImage: Image.network(
+          ? ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: Image.network(
                 manager!.user!.avatarUrl!,
                 loadingBuilder: (context, child, loadingProgress) => Loading(
                   context: context,
@@ -113,17 +116,15 @@ class _MobileEditProfileScreenState extends State<MobileEditProfileScreen> {
                 errorBuilder: (context, error, stackTrace) =>
                     Image.asset("./assets/avatar.png"),
                 fit: BoxFit.cover,
-              ).image,
-              radius: 60,
-            )
-          : CircleAvatar(
-              backgroundImage: Image.asset(
+              ))
+          : ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: Image.asset(
                 "./assets/avatar.png",
                 errorBuilder: (context, error, stackTrace) =>
                     Image.asset("./assets/avatar.png"),
                 fit: BoxFit.cover,
-              ).image,
-              radius: 60,
+              ),
             ),
     );
   }

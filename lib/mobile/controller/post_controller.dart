@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flemis/mobile/services/post_service.dart';
+import 'package:flemis/mobile/ui/widgets/components/alerts/loading_alert.dart';
+import 'package:flemis/mobile/utils/navigator.dart';
 import 'package:flutter/material.dart';
 
 import '../models/post.dart';
@@ -72,6 +74,8 @@ class PostController {
   }
 
   Future<void> createPost(Post post, {Map<String, dynamic>? file}) async {
+    AppNavigator navigator = AppNavigator(context: context!);
+    LoadingAlert.showAlert(context!);
     await _services.createPost(post, file).catchError((error, stack) {
       return error;
     }).then((response) {
@@ -79,8 +83,11 @@ class PostController {
         descriptionController.clear();
         contentController.clear();
         locationController.clear();
-        return response.result;
+        //return response.result;
+        LoadingAlert.close(context: context!);
+        navigator.goToBase();
       } else {
+        LoadingAlert.close(context: context!);
         //return Future.error(response.message.toString());
         descriptionController.clear();
         contentController.clear();

@@ -37,14 +37,15 @@ class _CustomPostCardState extends State<CustomPostCard> {
     postController = PostController(context: context);
     manager = context.read<Manager>();
     postNotifier = ValueNotifier(widget.post);
+
     super.initState();
   }
 
   @override
   void didChangeDependencies() async {
-    await userController
-        ?.getUserById(widget.post!.postedBy!)
-        .then((value) => user.value = value);
+    await userController?.getUserById(widget.post!.postedBy!.id!).then(
+        (value) => user.value = value,
+        onError: (error) => user.value = error);
     super.didChangeDependencies();
   }
 
@@ -74,7 +75,7 @@ class _CustomPostCardState extends State<CustomPostCard> {
             children: value == null
                 ? [
                     SizedBox(
-                      height: screenSize.height * 0.08,
+                      height: screenSize.height * 0.045,
                     ),
                     Loading(
                       context: context,
@@ -119,18 +120,17 @@ class _CustomPostCardState extends State<CustomPostCard> {
           child: Row(
             children: [
               Container(
-                padding: const EdgeInsets.only(left: 10, top: 10, bottom: 10),
+                margin: const EdgeInsets.only(left: 15, top: 15, bottom: 15),
+                height: 50,
+                width: 50,
                 child: user.avatarUrl != null
-                    ? CircleAvatar(
-                        backgroundImage: Image.network(user.avatarUrl!).image,
-                        backgroundColor: primaryColor,
-                        radius: 25,
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.network(user.avatarUrl!),
                       )
-                    : CircleAvatar(
-                        backgroundColor: primaryColor,
-                        radius: 25,
-                        backgroundImage:
-                            Image.asset("./assets/avatar.png").image,
+                    : ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.asset("./assets/avatar.png"),
                       ),
               ),
               SizedBox(
@@ -274,10 +274,11 @@ class _CustomPostCardState extends State<CustomPostCard> {
                                               await postController?.likePost(
                                                 {
                                                   "postId": notifier.value?.id,
-                                                  "user":
-                                                      manager!.user?.toMap(),
-                                                  "userNotified":
-                                                      notifier.value!.postedBy
+                                                  "user": manager!.user
+                                                      ?.toMapPost(),
+                                                  "userNotified": notifier
+                                                      .value!.postedBy
+                                                      ?.id
                                                 },
                                               );
                                             }
@@ -290,8 +291,8 @@ class _CustomPostCardState extends State<CustomPostCard> {
                                               await postController?.unlikePost(
                                                 {
                                                   "postId": notifier.value?.id,
-                                                  "user":
-                                                      manager!.user?.toMap(),
+                                                  "user": manager!.user
+                                                      ?.toMapPost(),
                                                 },
                                               );
                                             },

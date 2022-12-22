@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flemis/mobile/controller/auth_controller.dart';
 import 'package:flemis/mobile/models/user.dart';
 import 'package:flemis/mobile/ui/screens/camera/camera_screen.dart';
 import 'package:flemis/mobile/ui/screens/chat/message/message_screen.dart';
@@ -9,6 +10,7 @@ import 'package:flemis/mobile/ui/screens/post/create/create_post_screen_forms.da
 import 'package:flemis/mobile/ui/screens/post/view/post_screen.dart';
 import 'package:flemis/mobile/ui/screens/profile/edit/mobile_edit_profile_screen.dart';
 import 'package:flemis/mobile/ui/screens/profile/profile_screen.dart';
+import 'package:flemis/mobile/ui/screens/register/mobile_register_second_page.dart';
 import 'package:flemis/mobile/ui/screens/settings/settings_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -20,11 +22,21 @@ class AppNavigator {
   final BuildContext context;
 
   goToBase() {
-    Navigator.of(context).pushReplacementNamed("/base");
+    // Navigator.of(context).pushReplacementNamed("/base");
+    Navigator.of(context).pushNamedAndRemoveUntil("/base", (route) => false);
   }
 
   goToRegister() {
-    Navigator.of(context).pushReplacementNamed("/register");
+    Navigator.of(context).pushNamed("/register");
+  }
+
+  goToRegisterNext(AuthController authController, {File? avatar}) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => MobileRegisterSecondPage(
+            avatar: avatar, authController: authController),
+      ),
+    );
   }
 
   goToLogin({bool isAnimated = false}) {
@@ -102,6 +114,30 @@ class AppNavigator {
 
   goToCameraScreen() async {
     return await customPageTransition(const CameraScreen());
+  }
+
+  goToPrivacyScreen() {
+    Navigator.of(context).pushNamed("/privacy");
+  }
+
+  goToHelpScreen() {
+    Navigator.of(context).pushNamed("/help");
+  }
+
+  goToSecurityScreen() {
+    Navigator.of(context).pushNamed("/security");
+  }
+
+  goToNotificationSettings() {
+    Navigator.of(context).pushNamed("/notificationsettings");
+  }
+
+  goToAboutApp() {
+    Navigator.of(context).pushNamed("/aboutapp");
+  }
+
+  goToPlatformPolicy() {
+    Navigator.of(context).pushNamed("/policy");
   }
 
   goToMessageScreen({Chat? chat, User? to}) {

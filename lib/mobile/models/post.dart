@@ -5,7 +5,7 @@ import 'package:flemis/mobile/models/user.dart';
 
 class Post {
   String? id;
-  String? postedBy;
+  User? postedBy;
   String? description;
   String? contentUrl;
   String? content;
@@ -34,7 +34,27 @@ class Post {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       '_id': id,
-      'postedBy': postedBy,
+      'postedBy': postedBy?.toJson(),
+      'description': description,
+      'contentUrl': contentUrl,
+      'content': content,
+      'comments':
+          comments?.map((e) => Comment.fromMap(e.toMap())).toList().toString(),
+      'reports': reports,
+      'private': private,
+      'postedAt': postedAt?.toIso8601String(),
+      'likedBy':
+          likedBy?.map((e) => User.fromMap(e.toMap())).toList().toString(),
+      'location': location,
+      'selectedUsers': selectedUsers,
+    };
+  }
+
+  //Specific Map to Create Post
+  Map<String, dynamic> toMapCreate() {
+    return <String, dynamic>{
+      '_id': id,
+      'postedBy': postedBy?.id,
       'description': description,
       'contentUrl': contentUrl,
       'content': content,
@@ -53,7 +73,11 @@ class Post {
   factory Post.fromMap(Map<String, dynamic> json) {
     return Post(
       id: json['_id'] != null ? json['_id'] as String : null,
-      postedBy: json['postedBy'] != null ? json['postedBy'] as String : null,
+      postedBy: json['postedBy'] != null
+          ? json["postedBy"] is String
+              ? User.fromJson(json["postedBy"])
+              : User.fromMap(json['postedBy'])
+          : null,
       description:
           json['description'] != null ? json['description'] as String : null,
       contentUrl:

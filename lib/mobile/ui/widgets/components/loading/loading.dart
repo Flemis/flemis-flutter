@@ -12,8 +12,8 @@ class Loading extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: SizedBox(
-        height: 300,
-        width: 200,
+        height: 100,
+        width: 100,
         child: Column(
           children: [
             LoadingIndicator(

@@ -41,7 +41,7 @@ class _NotificationListItemState extends State<NotificationListItem> {
                             width: 100,
                             padding: const EdgeInsets.only(left: 10),
                             child: Text(
-                              widget.element!.createdBy! ?? "",
+                              widget.element!.createdBy!.username ?? "",
                               style: secondaryFontStyle[2],
                               overflow: TextOverflow.ellipsis,
                               softWrap: true,

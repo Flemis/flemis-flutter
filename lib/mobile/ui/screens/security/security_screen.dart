@@ -1,21 +1,16 @@
 import 'package:flemis/mobile/my_app_mobile.dart';
 import 'package:flutter/material.dart';
 
-class PlatformPolicyScreen extends StatefulWidget {
-  const PlatformPolicyScreen({super.key});
+class SecurityScreen extends StatelessWidget {
+  const SecurityScreen({super.key});
 
-  @override
-  State<PlatformPolicyScreen> createState() => _PlatformPolicyScreenState();
-}
-
-class _PlatformPolicyScreenState extends State<PlatformPolicyScreen> {
   @override
   Widget build(BuildContext context) {
     var screenSize = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Platform Policy",
+          "Security",
           style: primaryFontStyle[7],
         ),
         backgroundColor: Colors.transparent,

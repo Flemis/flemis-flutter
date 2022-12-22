@@ -1,9 +1,11 @@
 import 'package:flemis/mobile/controller/user_controller.dart';
 import 'package:flemis/mobile/my_app_mobile.dart';
+import 'package:flemis/mobile/providers/manager.dart';
 import 'package:flemis/mobile/ui/widgets/components/loading/loading.dart';
 import 'package:flemis/mobile/utils/navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../models/user.dart';
 
@@ -78,6 +80,7 @@ class CustomSearchDelegate extends SearchDelegate {
     var screenSize = MediaQuery.of(context).size;
     //final suggestions = query.isEmpty ? [] : [];
     UserController userController = UserController(context: context);
+    Manager manager = context.read<Manager>();
     Future _future = userController.findUsersByUsername(query);
     return Container(
       color: primaryColor,
@@ -90,10 +93,11 @@ class CustomSearchDelegate extends SearchDelegate {
           if (snapshot.hasData && snapshot.data != null) {
             List<User> users = snapshot.data;
             return ListView.builder(
-                itemCount: users.length,
-                padding: const EdgeInsets.only(top: 20),
-                itemBuilder: (context, index) =>
-                    _userItem(users, index, context, navigator));
+              itemCount: users.length,
+              padding: const EdgeInsets.only(top: 20),
+              itemBuilder: (context, index) =>
+                  _userItem(users, index, context, navigator, manager),
+            );
           }
           return errorWidget(screenSize, snapshot);
         },
@@ -103,11 +107,12 @@ class CustomSearchDelegate extends SearchDelegate {
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    AppNavigator navigator = AppNavigator(context: context);
+    /*  AppNavigator navigator = AppNavigator(context: context);
     var screenSize = MediaQuery.of(context).size;
     //final suggestions = query.isEmpty ? [] : [];
     UserController userController = UserController(context: context);
     Future _future = userController.findUsersByUsername(query);
+    Manager manager = context.read<Manager>();
     return Container(
       color: primaryColor,
       child: FutureBuilder(
@@ -120,14 +125,18 @@ class CustomSearchDelegate extends SearchDelegate {
           if (snapshot.hasData && snapshot.data != null) {
             List<User> users = snapshot.data;
             return ListView.builder(
-                itemCount: users.length,
-                padding: const EdgeInsets.only(top: 20),
-                itemBuilder: (context, index) =>
-                    _userItem(users, index, context, navigator));
+              itemCount: users.length,
+              padding: const EdgeInsets.only(top: 20),
+              itemBuilder: (context, index) =>
+                  _userItem(users, index, context, navigator, manager),
+            );
           }
           return errorWidget(screenSize, snapshot);
         },
       ),
+    ); */
+    return Container(
+      color: primaryColor,
     );
   }
 
@@ -169,12 +178,12 @@ class CustomSearchDelegate extends SearchDelegate {
   }
 
   Widget _userItem(List<User> users, int index, BuildContext context,
-      AppNavigator navigator) {
+      AppNavigator navigator, Manager manager) {
     return InkWell(
       onTap: () => navigator.goToProfile(
-        isYourProfile: false,
-        user: users[index],
-      ),
+          isYourProfile: users[index].id != manager.user!.id,
+          user: users[index],
+          isAnimated: true),
       child: ListTile(
         leading: users[index].avatarUrl != null &&
                 users[index].avatarUrl!.isNotEmpty

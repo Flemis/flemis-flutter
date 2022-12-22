@@ -35,7 +35,7 @@ class AuthController {
         userNameController.clear();
         passwordController.clear();
         manager.user = serviceResponse.result;
-        await userRepository.save(manager.user!);
+         await userRepository.save(manager.user!);
         LoadingAlert.close(context: context!);
         navigator.goToBase();
       } else {
@@ -44,7 +44,6 @@ class AuthController {
         LoadingAlert.close(context: context!);
         ErrorAlert.showAlert(context!,
             serviceResponse.message ?? "Error while trying to log in");
-
         Future.delayed(const Duration(seconds: 2), () {
           return ErrorAlert.close(context: context!);
         });
@@ -52,12 +51,15 @@ class AuthController {
     });
   }
 
-  Future<void> register(Map<String, dynamic> body) async {
+  Future<void> register(
+    Map<String, dynamic> body, {
+    Map<String, dynamic>? file,
+  }) async {
     Manager manager = context!.read<Manager>();
     AppNavigator navigator = AppNavigator(context: context!);
 
     LoadingAlert.showAlert(context!);
-    await authService.register(body).catchError((error, stack) {
+    await authService.register(body, file: file).catchError((error, stack) {
       return error;
     }).then((serviceResponse) async {
       if (serviceResponse.status >= 200 && serviceResponse.status <= 299) {

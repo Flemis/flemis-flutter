@@ -285,7 +285,10 @@ class _ChatListScreenState extends State<ChatListScreen>
                       chatController?.getAllConversations(manager!.user!.id!),
                   builder: (context, AsyncSnapshot<dynamic> snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Loading(context: context);
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 100),
+                        child: Loading(context: context),
+                      );
                     }
                     if (snapshot.hasData || snapshot.data != null) {
                       return chatItem(snapshot);

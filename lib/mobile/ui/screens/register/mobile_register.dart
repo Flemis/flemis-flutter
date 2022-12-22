@@ -1,7 +1,12 @@
+import 'dart:io';
+
 import 'package:flemis/mobile/controller/auth_controller.dart';
 import 'package:flemis/mobile/my_app_mobile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import '../../../utils/navigator.dart';
 
 class MobileRegister extends StatefulWidget {
   const MobileRegister({Key? key}) : super(key: key);
@@ -12,10 +17,13 @@ class MobileRegister extends StatefulWidget {
 
 class _MobileRegisterState extends State<MobileRegister> {
   AuthController? authController;
+  AppNavigator? appNavigator;
+  File? avatar;
 
   @override
   void initState() {
     authController = AuthController(context: context);
+    appNavigator = AppNavigator(context: context);
     super.initState();
   }
 
@@ -61,6 +69,29 @@ class _MobileRegisterState extends State<MobileRegister> {
                 height: screenSize.height < 700
                     ? screenSize.height * 0.02
                     : screenSize.height * 0.05,
+              ),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _editAvatar(),
+                  const SizedBox(),
+                  Container(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: TextButton(
+                      onPressed: () {},
+                      child: Text(
+                        avatar != null ? "Change avatar" : "Choose picture",
+                        style: TextStyle(
+                          color: secondaryColor,
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: GoogleFonts.inter().fontFamily,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -171,173 +202,6 @@ class _MobileRegisterState extends State<MobileRegister> {
                   ),
                 ],
               ),
-              const SizedBox(
-                height: 10,
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    child: Text(
-                      "First name",
-                      style: primaryFontStyle[6],
-                    ),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.only(top: 5),
-                    height: 50,
-                    width: screenSize.width * 0.85,
-                    child: TextFormField(
-                      controller: authController?.firstNameController,
-                      keyboardType: TextInputType.emailAddress,
-                      textAlignVertical: TextAlignVertical.center,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.deny(''),
-                        FilteringTextInputFormatter.deny(' '),
-                        FilteringTextInputFormatter.deny('  '),
-                      ],
-                      decoration: InputDecoration(
-                        hintText: "First name",
-                        contentPadding:
-                            const EdgeInsets.only(bottom: 10, left: 20),
-                        filled: true,
-                        fillColor: const Color(0xffB7BDF7),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(
-                            width: 1,
-                            color: secondaryColor,
-                          ),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(
-                            width: 0.5,
-                            //color: Theme.of(context).colorScheme.surface,
-                          ),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    child: Text(
-                      "Last name",
-                      style: primaryFontStyle[6],
-                    ),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.only(top: 5),
-                    height: 50,
-                    width: screenSize.width * 0.85,
-                    child: TextFormField(
-                      controller: authController?.lastNameController,
-                      keyboardType: TextInputType.emailAddress,
-                      textAlignVertical: TextAlignVertical.center,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.deny(''),
-                        FilteringTextInputFormatter.deny(' '),
-                        FilteringTextInputFormatter.deny('  '),
-                      ],
-                      decoration: InputDecoration(
-                        hintText: "Last name",
-                        contentPadding:
-                            const EdgeInsets.only(bottom: 10, left: 20),
-                        filled: true,
-                        fillColor: const Color(0xffB7BDF7),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(
-                            width: 1,
-                            color: secondaryColor,
-                          ),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(
-                            width: 0.5,
-                            //color: Theme.of(context).colorScheme.surface,
-                          ),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    child: Text(
-                      "Password",
-                      style: primaryFontStyle[6],
-                    ),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.only(top: 5),
-                    height: 50,
-                    width: screenSize.width * 0.85,
-                    child: TextFormField(
-                      controller: authController?.passwordController,
-                      keyboardType: TextInputType.visiblePassword,
-                      obscureText: !visiblePassword,
-                      textAlignVertical: TextAlignVertical.center,
-                      decoration: InputDecoration(
-                        suffixIconColor: secondaryColor,
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            !visiblePassword
-                                ? Icons.visibility
-                                : Icons.visibility_off,
-                            color: visiblePassword ? secondaryColor : null,
-                            size: 20,
-                          ),
-                          onPressed: () {
-                            if (!visiblePassword) {
-                              setState(() {
-                                visiblePassword = true;
-                              });
-                            } else {
-                              setState(() {
-                                visiblePassword = false;
-                              });
-                            }
-                          },
-                        ),
-                        hintText: "Password",
-                        contentPadding:
-                            const EdgeInsets.only(bottom: 10, left: 20),
-                        filled: true,
-                        fillColor: const Color(0xffB7BDF7),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(
-                            width: 1,
-                            color: secondaryColor,
-                          ),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(
-                            width: 1,
-                            //  color: secondaryColor,
-                          ),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
               Container(
                 height: screenSize.height < 700 ? 50 : 70,
                 width: screenSize.width * 0.85,
@@ -352,15 +216,13 @@ class _MobileRegisterState extends State<MobileRegister> {
                       ),
                     ),
                   ),
-                  onPressed: () async => await authController?.register({
-                    "username": authController?.userNameController.text,
-                    "email": authController?.emailController.text,
-                    "firstname": authController?.firstNameController.text,
-                    "lastname": authController?.lastNameController.text,
-                    "password": authController?.passwordController.text
-                  }),
+                  onPressed: authController?.userNameController == null ||
+                          authController?.emailController == null
+                      ? null
+                      : () async => appNavigator
+                          ?.goToRegisterNext(authController!, avatar: avatar),
                   child: Text(
-                    "Register",
+                    "Next",
                     style: primaryFontStyle[6],
                   ),
                 ),
@@ -369,6 +231,26 @@ class _MobileRegisterState extends State<MobileRegister> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _editAvatar({File? avatar}) {
+    return Container(
+      margin: const EdgeInsets.only(top: 25),
+      child: avatar != null
+          ? CircleAvatar(
+              backgroundImage: Image.file(
+                File.fromUri(Uri.file(avatar.path)),
+                errorBuilder: (context, error, stackTrace) =>
+                    Image.asset("./assets/avatar.png"),
+                fit: BoxFit.cover,
+              ).image,
+              radius: 60,
+            )
+          : const CircleAvatar(
+              backgroundColor: Colors.yellow,
+              radius: 60,
+            ),
     );
   }
 }

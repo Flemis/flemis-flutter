@@ -251,7 +251,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Icons.close,
                   size: 30,
                 ),
-                padding: const EdgeInsets.only(left: 15),
+                padding: const EdgeInsets.only(left: 15, bottom: 30),
                 onPressed: () {
                   navigator?.backPage();
                 },
@@ -269,7 +269,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             fixedSize: const Size.fromHeight(40),
-                            backgroundColor: primaryColor,
+                            backgroundColor: primaryColor.withOpacity(0.4),
                             shape: const CircleBorder(),
                           ),
                           child: const Icon(
@@ -296,7 +296,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             fixedSize: const Size.fromHeight(40),
-                            backgroundColor: primaryColor,
+                            backgroundColor: primaryColor.withOpacity(0.4),
                             shape: const CircleBorder(),
                           ),
                           child: const Icon(
@@ -319,124 +319,128 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ],
       ),
-      body: ValueListenableBuilder(
-        valueListenable: resetCache,
-        builder: (context, isReseted, _) {
-          return FutureBuilder(
-            future: !widget.isYourProfile && widget.user != null
-                ? accountController?.getProfileInfo(widget.user!.id!)
-                : accountController?.getProfileInfo(manager!.user!.id!),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Padding(
-                  padding: const EdgeInsets.only(top: 150.0),
-                  child: Loading(context: context),
-                );
-              }
+      body: SizedBox(
+        child: ValueListenableBuilder(
+          valueListenable: resetCache,
+          builder: (context, isReseted, _) {
+            return FutureBuilder(
+              future: (!widget.isYourProfile && widget.user != null) ||
+                      widget.user != null
+                  ? accountController?.getProfileInfo(widget.user!.id!)
+                  : accountController?.getProfileInfo(manager!.user!.id!),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 50.0),
+                    child: Loading(context: context),
+                  );
+                }
 
-              if (snapshot.hasData && snapshot.data != null) {
-                User user = snapshot.data as User;
-                ValueNotifier<User> notifierUser = ValueNotifier(user);
-                return AnimationConfiguration.staggeredList(
-                  position: 0,
-                  child: FadeInAnimation(
-                    duration: const Duration(seconds: 2),
-                    curve: Curves.ease,
-                    child: RefreshIndicator(
-                      onRefresh: onRefresh,
-                      color: secondaryColor,
-                      backgroundColor: primaryColor,
-                      child: SizedBox(
-                        height: screenSize.height,
-                        width: screenSize.width,
-                        child: SingleChildScrollView(
-                          physics: const BouncingScrollPhysics(
-                            parent: AlwaysScrollableScrollPhysics(),
-                          ),
-                          child: Stack(
-                            children: [
-                              backgroundCover(screenSize, user),
-                              backgroundCoverGradient(screenSize),
-                              Container(
-                                height: screenSize.height * 0.8,
-                                alignment: Alignment.center,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    _avatarWidget(context, screenSize,
-                                        notifierUser, widget.isYourProfile),
-                                    Container(
-                                      padding: const EdgeInsets.only(top: 20),
-                                      child: Text(
-                                        user.username!,
-                                        style: secondaryFontStyle[2],
-                                      ),
-                                    ),
-                                    if ((widget.isYourProfile &&
-                                            widget.user == null) ||
-                                        manager?.currentPage.value == 4)
-                                      Column(
-                                        children: [
-                                          TextButton(
-                                            child: const Text(
-                                              "Edit profile",
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                              ),
-                                            ),
-                                            onPressed: () async =>
-                                                navigator?.goToEditProfile(
-                                                    user: manager!.user),
-                                          ),
-                                          Container(
-                                            padding:
-                                                const EdgeInsets.only(top: 5),
-                                            child: Text(
-                                              user.bio != null
-                                                  ? user.bio!
-                                                  : user.id!,
-                                              style: secondaryFontStyle[3],
-                                            ),
-                                          ),
-                                        ],
-                                      )
-                                    else
+                if (snapshot.hasData && snapshot.data != null) {
+                  User user = snapshot.data as User;
+                  ValueNotifier<User> notifierUser = ValueNotifier(user);
+                  return AnimationConfiguration.staggeredList(
+                    position: 0,
+                    child: FadeInAnimation(
+                      duration: const Duration(seconds: 2),
+                      curve: Curves.ease,
+                      child: RefreshIndicator(
+                        onRefresh: onRefresh,
+                        color: secondaryColor,
+                        backgroundColor: primaryColor,
+                        child: SizedBox(
+                          height: screenSize.height,
+                          width: screenSize.width,
+                          child: SingleChildScrollView(
+                            physics: const BouncingScrollPhysics(
+                              parent: AlwaysScrollableScrollPhysics(),
+                            ),
+                            child: Stack(
+                              children: [
+                                backgroundCover(screenSize, user),
+                                backgroundCoverGradient(screenSize),
+                                Container(
+                                  height: screenSize.height * 0.8,
+                                  alignment: Alignment.center,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      _avatarWidget(context, screenSize,
+                                          notifierUser, widget.isYourProfile),
                                       Container(
-                                        padding: const EdgeInsets.only(top: 10),
+                                        padding: const EdgeInsets.only(top: 20),
                                         child: Text(
-                                          user.bio != null
-                                              ? user.bio!
-                                              : user.id!,
-                                          style: secondaryFontStyle[3],
+                                          user.username!,
+                                          style: secondaryFontStyle[2],
                                         ),
                                       ),
-                                    _infoCard(screenSize, notifierUser),
-                                    //  _memories(screenSize, user),
-                                  ],
+                                      if ((widget.isYourProfile &&
+                                              widget.user == null) ||
+                                          manager?.currentPage.value == 4)
+                                        Column(
+                                          children: [
+                                            TextButton(
+                                              child: const Text(
+                                                "Edit profile",
+                                                style: TextStyle(
+                                                  fontSize: 15,
+                                                ),
+                                              ),
+                                              onPressed: () async =>
+                                                  navigator?.goToEditProfile(
+                                                      user: manager!.user),
+                                            ),
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.only(top: 5),
+                                              child: Text(
+                                                user.bio != null
+                                                    ? user.bio!
+                                                    : user.id!,
+                                                style: secondaryFontStyle[3],
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      else
+                                        Container(
+                                          padding:
+                                              const EdgeInsets.only(top: 10),
+                                          child: Text(
+                                            user.bio != null
+                                                ? user.bio!
+                                                : user.id!,
+                                            style: secondaryFontStyle[3],
+                                          ),
+                                        ),
+                                      _infoCard(screenSize, notifierUser),
+                                      //  _memories(screenSize, user),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
+                  );
+                }
+                return Padding(
+                  padding: const EdgeInsets.only(top: 40),
+                  child: Center(
+                    child: Text(
+                      snapshot.error != null
+                          ? snapshot.error.toString()
+                          : "no data",
+                      style: const TextStyle(color: whiteColor),
+                    ),
                   ),
                 );
-              }
-              return Padding(
-                padding: const EdgeInsets.only(top: 40),
-                child: Center(
-                  child: Text(
-                    snapshot.error != null
-                        ? snapshot.error.toString()
-                        : "no data",
-                    style: const TextStyle(color: whiteColor),
-                  ),
-                ),
-              );
-            },
-          );
-        },
+              },
+            );
+          },
+        ),
       ),
     );
   }
@@ -466,14 +470,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             : screenSize.width * 0.25,
                       ),
                       Container(
+                        height: 100,
+                        width: 100,
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.yellow, width: 3),
-                          shape: BoxShape.circle,
+                          borderRadius: BorderRadius.circular(15),
                         ),
                         child: user.avatarUrl != null &&
                                 user.avatarUrl!.isNotEmpty
-                            ? CircleAvatar(
-                                backgroundImage: Image.network(
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.network(
                                   user.avatarUrl!,
                                   loadingBuilder:
                                       (context, child, loadingProgress) =>
@@ -483,24 +490,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   errorBuilder: (context, error, stackTrace) =>
                                       Image.asset("./assets/avatar.png"),
                                   fit: BoxFit.cover,
-                                ).image,
-                                radius: 60,
-                              )
-                            : CircleAvatar(
-                                backgroundImage: Image.asset(
+                                ))
+                            : ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.asset(
                                   "./assets/avatar.png",
                                   errorBuilder: (context, error, stackTrace) =>
                                       Image.asset("./assets/avatar.png"),
                                   fit: BoxFit.cover,
-                                ).image,
-                                radius: 60,
-                              ),
+                                )),
                       ),
                       Padding(
                         padding: user.followers == null ||
                                 !user.followers!.any(
                                     (element) => element == manager!.user!.id!)
-                            ? const EdgeInsets.only(left: 0, right: 5.0)
+                            ? const EdgeInsets.only(left: 0, right: 20.0)
                             : const EdgeInsets.only(left: 5, right: 10.0),
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
@@ -525,7 +529,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   await _repository
                                       .updateUserLocally(manager!.user!);
                                   await _userController?.followUser(
-                                      manager!.user!.id!, user.id!);
+                                      manager!.user!, user.id!);
                                 }
                               : () async {
                                   notifier.value.followers?.removeWhere(
@@ -537,7 +541,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   await _repository
                                       .updateUserLocally(manager!.user!);
                                   await _userController?.unfollowUser(
-                                      manager!.user!.id!, user.id!);
+                                      manager!.user!, user.id!);
                                 },
                           child: user.followers == null ||
                                   !user.followers!.any((element) =>
@@ -549,14 +553,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ]
                   : [
                       Container(
+                        height: 100,
+                        width: 100,
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.yellow, width: 3),
-                          shape: BoxShape.circle,
+                          borderRadius: BorderRadius.circular(15),
                         ),
                         child: user.avatarUrl != null &&
                                 user.avatarUrl!.isNotEmpty
-                            ? CircleAvatar(
-                                backgroundImage: Image.network(
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.network(
                                   user.avatarUrl!,
                                   loadingBuilder:
                                       (context, child, loadingProgress) =>
@@ -566,17 +573,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   errorBuilder: (context, error, stackTrace) =>
                                       Image.asset("./assets/avatar.png"),
                                   fit: BoxFit.cover,
-                                ).image,
-                                radius: 60,
+                                ),
                               )
-                            : CircleAvatar(
-                                backgroundImage: Image.asset(
+                            : ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.asset(
                                   "./assets/avatar.png",
                                   errorBuilder: (context, error, stackTrace) =>
                                       Image.asset("./assets/avatar.png"),
                                   fit: BoxFit.cover,
-                                ).image,
-                                radius: 60,
+                                ),
                               ),
                       ),
                     ],

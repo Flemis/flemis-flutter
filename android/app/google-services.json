@@ -29,6 +29,13 @@
             {
               "client_id": "201376969510-udkpce0vf2f618q9dmgjt5bcgl28bq3d.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "201376969510-fgt91d2n25fap8fg5el7ssk65cvpvrb8.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.fernandosini.flemis"
+              }
             }
           ]
         }

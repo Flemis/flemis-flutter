@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flemis/mobile/models/notification_type.dart';
+import 'package:flemis/mobile/models/user.dart';
 
 class Notifications {
   Notifications(
@@ -16,7 +17,7 @@ class Notifications {
   DateTime? createdAt;
   NotificationType? notificationType;
   String? message;
-  String? createdBy;
+  User? createdBy;
   String? userNotified;
 
   factory Notifications.fromJson(String str) =>
@@ -31,7 +32,11 @@ class Notifications {
             NotificationType.values.elementAt(json["notificationType"] as int),
         message: json["message"],
         userNotified: json["userNotified"],
-        createdBy: json["createdBy"],
+        createdBy: json["createdBy"] != null
+            ? json["createdBy"] is String
+                ? User.fromJson(json["createdBy"])
+                : User.fromMap(json["createdBy"])
+            : null,
         createdAt: json["createdAt"] == null
             ? null
             : DateTime.tryParse(json["createdAt"]),

@@ -77,31 +77,39 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           Row(
                             children: [
                               if (manager!.user!.avatarUrl != null)
-                                CircleAvatar(
-                                  backgroundImage: Image.network(
-                                    manager!.user!.avatarUrl!,
-                                    loadingBuilder:
-                                        (context, child, loadingProgress) =>
-                                            Loading(
-                                      context: context,
+                                SizedBox(
+                                  height: 60,
+                                  width: 60,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(15),
+                                    child: Image.network(
+                                      manager!.user!.avatarUrl!,
+                                      loadingBuilder:
+                                          (context, child, loadingProgress) =>
+                                              Loading(
+                                        context: context,
+                                      ),
+                                      errorBuilder: (context, error,
+                                              stackTrace) =>
+                                          Image.asset("./assets/avatar.png"),
+                                      fit: BoxFit.cover,
                                     ),
-                                    errorBuilder:
-                                        (context, error, stackTrace) =>
-                                            Image.asset("./assets/avatar.png"),
-                                    fit: BoxFit.cover,
-                                  ).image,
-                                  radius: 30,
+                                  ),
                                 )
                               else
-                                CircleAvatar(
-                                  backgroundImage: Image.asset(
-                                    "./assets/avatar.png",
-                                    errorBuilder:
-                                        (context, error, stackTrace) =>
-                                            Image.asset("./assets/avatar.png"),
-                                    fit: BoxFit.cover,
-                                  ).image,
-                                  radius: 30,
+                                SizedBox(
+                                  height: 60,
+                                  width: 60,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(15),
+                                    child: Image.asset(
+                                      "./assets/avatar.png",
+                                      errorBuilder: (context, error,
+                                              stackTrace) =>
+                                          Image.asset("./assets/avatar.png"),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
                                 ),
                               const SizedBox(
                                 width: 10,
@@ -137,7 +145,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                   InkWell(
-                    onTap: () {},
+                    onTap: () async => navigator?.goToPrivacyScreen(),
                     child: Padding(
                       padding: const EdgeInsets.only(
                           left: 20.0, right: 20, top: 20, bottom: 20),
@@ -173,7 +181,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                   InkWell(
-                    onTap: () {},
+                    onTap: () async => navigator?.goToPlatformPolicy(),
                     child: Padding(
                       padding: const EdgeInsets.only(
                           left: 20.0, right: 20, top: 20, bottom: 20),
@@ -209,7 +217,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                   InkWell(
-                    onTap: () {},
+                    onTap: () async => navigator?.goToSecurityScreen(),
                     child: Padding(
                       padding: const EdgeInsets.only(
                           left: 20.0, right: 20, top: 20, bottom: 20),
@@ -246,7 +254,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                   InkWell(
-                    onTap: () {},
+                    onTap: () async => navigator?.goToNotificationSettings(),
                     child: Padding(
                       padding: const EdgeInsets.only(
                           left: 20.0, right: 20, top: 20, bottom: 20),
@@ -283,7 +291,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                   InkWell(
-                    onTap: () {},
+                    onTap: () async => navigator?.goToHelpScreen(),
                     child: Padding(
                       padding: const EdgeInsets.only(
                           left: 20.0, right: 20, top: 20, bottom: 20),
@@ -320,7 +328,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                   InkWell(
-                    onTap: () {},
+                    onTap: () async => navigator?.goToAboutApp(),
                     child: Padding(
                       padding: const EdgeInsets.only(
                           left: 20.0, right: 20, top: 20, bottom: 20),

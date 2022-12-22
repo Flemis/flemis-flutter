@@ -77,7 +77,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
         elevation: 0,
         toolbarHeight: Platform.isAndroid ? 110 : 100,
         automaticallyImplyLeading: false,
-        title: Row(
+        /* title: Row(
           children: [
             if (Platform.isAndroid)
               SizedBox(
@@ -175,7 +175,26 @@ class _ExploreScreenState extends State<ExploreScreen> {
           const SizedBox(
             width: 20,
           ),
-        ],
+        ], */
+        title: TextFormField(
+          decoration: InputDecoration(
+            contentPadding: const EdgeInsets.symmetric(vertical: 10),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide.none),
+            fillColor: Colors.grey[900],
+            hintText: "Search",
+            hintStyle: const TextStyle(
+              color: whiteColor,
+            ),
+            prefixIcon: const Icon(
+              FontAwesome5.search,
+              size: 17,
+              color: whiteColor,
+            ),
+            filled: true,
+          ),
+        ),
       ),
       body: SizedBox(
         height: screenSize.height,
@@ -191,7 +210,10 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 future: _future,
                 builder: (context, AsyncSnapshot snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Loading(context: context);
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 100),
+                      child: Loading(context: context),
+                    );
                   }
                   if (snapshot.hasData || snapshot.data != null) {
                     List<Post> data = snapshot.data;
