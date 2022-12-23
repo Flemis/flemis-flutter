@@ -37,15 +37,15 @@ class _CustomPostCardState extends State<CustomPostCard> {
     postController = PostController(context: context);
     manager = context.read<Manager>();
     postNotifier = ValueNotifier(widget.post);
-
+    user.value = widget.post!.postedBy;
     super.initState();
   }
 
   @override
   void didChangeDependencies() async {
-    await userController?.getUserById(widget.post!.postedBy!.id!).then(
+    /* await userController?.getUserById(widget.post!.postedBy!.id!).then(
         (value) => user.value = value,
-        onError: (error) => user.value = error);
+        onError: (error) => user.value = error); */
     super.didChangeDependencies();
   }
 
@@ -277,8 +277,7 @@ class _CustomPostCardState extends State<CustomPostCard> {
                                                   "user": manager!.user
                                                       ?.toMapPost(),
                                                   "userNotified": notifier
-                                                      .value!.postedBy
-                                                      ?.id
+                                                      .value!.postedBy?.id
                                                 },
                                               );
                                             }

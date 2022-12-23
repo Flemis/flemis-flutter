@@ -176,7 +176,7 @@ class _MobileHomeState extends State<MobileHome> {
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Padding(
-                    padding: const EdgeInsets.only(bottom:100),
+                    padding: const EdgeInsets.only(bottom: 100),
                     child: Loading(context: context),
                   );
                 }

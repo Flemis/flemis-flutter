@@ -4,7 +4,9 @@ import 'package:flemis/mobile/my_app_mobile.dart';
 import 'package:flemis/mobile/providers/manager.dart';
 import 'package:flemis/mobile/ui/screens/chat/chat_list_screen.dart';
 import 'package:flemis/mobile/ui/screens/explore/explore_screen.dart';
+import 'package:flemis/mobile/ui/screens/flemis/flemis_screen.dart';
 import 'package:flemis/mobile/ui/screens/home/mobile_home.dart';
+import 'package:flemis/mobile/ui/screens/policy/privacy_policy_screen.dart';
 import 'package:flemis/mobile/ui/screens/profile/profile_screen.dart';
 import 'package:flemis/mobile/utils/navigator.dart';
 import 'package:flutter/cupertino.dart';
@@ -35,7 +37,7 @@ class _MobileBaseState extends State<MobileBase> {
       const ChatListScreen(),
       const ExploreScreen(),
       const MobileHome(),
-      const MobileHome(),
+      const FlemisScreen(),
       const ProfileScreen(
         isYourProfile: true,
       ),

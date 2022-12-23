@@ -9,6 +9,7 @@ import 'package:flemis/mobile/ui/widgets/components/loading/loading.dart';
 import 'package:flemis/mobile/ui/widgets/components/notifications/notification_list_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
 import '../../../my_app_mobile.dart';
@@ -39,15 +40,32 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   @override
   void didChangeDependencies() async {
     super.didChangeDependencies();
-    await notificationsController
+    /*   await notificationsController
         ?.getNotifications(manager!.user!.id!)
         .then((value) => streamController.sink.add(value))
-        .catchError((error, stack) => streamController.sink.addError(error));
+        .catchError((error, stack) => streamController.sink.addError(error)); */
+
+    notificationsController
+        ?.getNotifications(manager!.user!.id!)
+        .asStream()
+        .listen((event) {
+      streamController.sink.add(event);
+      // streamController.sink.close();
+    }, onError: (error) => streamController.sink.addError(error));
   }
 
-  Future onRefresh() async {
+  Future<void> onRefresh() async {
     //future = notificationsController?.getNotifications(manager!.user!.id!);
     resetCache.value = !resetCache.value;
+    notificationsController
+        ?.getNotifications(manager!.user!.id!)
+        .asStream()
+        .listen(
+      (event) {
+        streamController.sink.add(event);
+      },
+      onError: (error) => streamController.sink.addError(error),
+    );
     return;
   }
 
@@ -215,21 +233,36 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             height: screenSize.height,
             width: screenSize.width,
             child: ListView.builder(
+              reverse: true,
               physics: const BouncingScrollPhysics(),
               itemCount: notifications.length,
               itemBuilder: (context, index) {
-                if (index <= 0) {
+                if (index >= notifications.length - 1) {
                   return _followersRequests(screenSize);
                 }
-                return Column(
-                  children: [
-                    const Divider(
-                      color: whiteColor,
-                    ),
-                    NotificationListItem(
-                      element: notifications[index],
-                    ),
-                  ],
+                return Dismissible(
+                  key: UniqueKey(),
+                  direction: DismissDirection.endToStart,
+                  background: Container(color: Colors.green),
+                  onDismissed: (direction) {
+                    notifications.removeAt(index);
+                  },
+                  secondaryBackground: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 50),
+                    alignment: AlignmentDirectional.centerEnd,
+                    color: Colors.red,
+                    child: const Icon(FontAwesomeIcons.trashCan),
+                  ),
+                  child: Column(
+                    children: [
+                      /*  const Divider(
+                        color: whiteColor,
+                      ), */
+                      NotificationListItem(
+                        element: notifications[index],
+                      ),
+                    ],
+                  ),
                 );
               },
             ),
