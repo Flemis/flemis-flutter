@@ -115,7 +115,7 @@ class User {
       };
 
   //Specific map to create User json on Create post
-  Map<String, dynamic> toMapPost() => {
+  Map<String, dynamic> toMapPost({bool fromLike = false}) => {
         "_id": id,
         "username": username,
         "firstname": firstname,
@@ -123,13 +123,13 @@ class User {
         "bio": bio,
         "avatarUrl": avatarUrl,
         "email": email,
-        "token": token,
-        "followers": followers?.toList(),
-        "following": following?.toList(),
-        "subscribers": subscribers?.toList(),
-        "subscribed": subscribed?.toList(),
-        "password": password,
-        "posts": posts?.map((e) => Post.fromMap(e.toMap())).toList(),
+        "followers": !fromLike ? followers?.toList() : null,
+        "following": !fromLike ? following?.toList() : null,
+        "subscribers": !fromLike ? subscribers?.toList() : null,
+        "subscribed": !fromLike ? subscribed?.toList() : null,
+        "posts": !fromLike
+            ? posts?.map((e) => Post.fromMap(e.toMap())).toList()
+            : null,
         "createdAt": createdAt?.toIso8601String(),
         "birthday": birthday,
         "isBanned": isBanned,

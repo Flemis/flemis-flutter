@@ -275,7 +275,7 @@ class _CustomPostCardState extends State<CustomPostCard> {
                                                 {
                                                   "postId": notifier.value?.id,
                                                   "user": manager!.user
-                                                      ?.toMapPost(),
+                                                      ?.toMapPost(fromLike: true),
                                                   "userNotified": notifier
                                                       .value!.postedBy?.id
                                                 },
@@ -291,7 +291,7 @@ class _CustomPostCardState extends State<CustomPostCard> {
                                                 {
                                                   "postId": notifier.value?.id,
                                                   "user": manager!.user
-                                                      ?.toMapPost(),
+                                                      ?.toMapPost(fromLike: true),
                                                 },
                                               );
                                             },

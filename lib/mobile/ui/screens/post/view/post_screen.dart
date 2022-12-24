@@ -250,7 +250,8 @@ class _PostScreenState extends State<PostScreen> {
                             await _postController?.likePost(
                               {
                                 "postId": postNotifier.value!.id,
-                                "user": manager!.user?.toMap(),
+                                "user":
+                                    manager!.user?.toMapPost(fromLike: true),
                                 "userNotified": postNotifier.value!.postedBy
                               },
                             );
@@ -262,7 +263,8 @@ class _PostScreenState extends State<PostScreen> {
                             await _postController?.unlikePost(
                               {
                                 "postId": postNotifier.value!.id,
-                                "user": manager!.user?.toMap(),
+                                "user":
+                                    manager!.user?.toMapPost(fromLike: true),
                               },
                             );
                           },

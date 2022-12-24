@@ -269,8 +269,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             fixedSize: const Size.fromHeight(40),
-                            backgroundColor: primaryColor.withOpacity(0.4),
-                            shape: const CircleBorder(),
+                            //backgroundColor: primaryColor.withOpacity(0.4),
+                            backgroundColor: Colors.transparent,
+                            elevation: 0,
+                            shape: const CircleBorder(
+                              side: BorderSide(color: whiteColor, width: 2),
+                            ),
                           ),
                           child: const Icon(
                             Icons.settings,
@@ -296,8 +300,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             fixedSize: const Size.fromHeight(40),
-                            backgroundColor: primaryColor.withOpacity(0.4),
-                            shape: const CircleBorder(),
+                            // backgroundColor: primaryColor.withOpacity(0.4),
+                            backgroundColor: Colors.transparent,
+                            elevation: 0,
+                            shape: const CircleBorder(
+                              side: BorderSide(color: whiteColor, width: 2),
+                            ),
                           ),
                           child: const Icon(
                             Icons.settings,
@@ -360,39 +368,86 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 backgroundCover(screenSize, user),
                                 backgroundCoverGradient(screenSize),
                                 Container(
-                                  height: screenSize.height * 0.8,
+                                  height: screenSize.height * .6,
                                   alignment: Alignment.center,
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      _avatarWidget(context, screenSize,
-                                          notifierUser, widget.isYourProfile),
-                                      Container(
-                                        padding: const EdgeInsets.only(top: 20),
-                                        child: Text(
-                                          user.username!,
-                                          style: secondaryFontStyle[2],
-                                        ),
+                                      Row(
+                                        children: [
+                                          _avatarWidget(
+                                              context,
+                                              screenSize,
+                                              notifierUser,
+                                              widget.isYourProfile),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Container(
+                                                padding: const EdgeInsets.only(
+                                                  left: 20,
+                                                ),
+                                                child: Text(
+                                                  "${user.firstname!} ${user.lastname!}",
+                                                  style: secondaryFontStyle[8],
+                                                ),
+                                              ),
+                                              _infoCard(
+                                                  screenSize, notifierUser),
+                                            ],
+                                          ),
+                                        ],
                                       ),
                                       if ((widget.isYourProfile &&
                                               widget.user == null) ||
                                           manager?.currentPage.value == 4)
                                         Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
-                                            TextButton(
-                                              child: const Text(
-                                                "Edit profile",
-                                                style: TextStyle(
-                                                  fontSize: 15,
+                                            Row(
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 25.0, top: 10),
+                                                  child: Text(
+                                                    user.username!,
+                                                    style:
+                                                        secondaryFontStyle[2],
+                                                  ),
                                                 ),
-                                              ),
-                                              onPressed: () async =>
-                                                  navigator?.goToEditProfile(
-                                                      user: manager!.user),
+                                              ],
+                                            ),
+                                            Row(
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 22.0),
+                                                  child: TextButton(
+                                                    child: const Text(
+                                                      "Edit profile",
+                                                      style: TextStyle(
+                                                        fontSize: 15,
+                                                      ),
+                                                    ),
+                                                    onPressed: () async =>
+                                                        navigator
+                                                            ?.goToEditProfile(
+                                                                user: manager!
+                                                                    .user),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                             Container(
-                                              padding:
-                                                  const EdgeInsets.only(top: 5),
+                                              padding: const EdgeInsets.only(
+                                                  top: 5, left: 20),
+                                              alignment: Alignment.centerLeft,
                                               child: Text(
                                                 user.bio != null
                                                     ? user.bio!
@@ -413,7 +468,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             style: secondaryFontStyle[3],
                                           ),
                                         ),
-                                      _infoCard(screenSize, notifierUser),
+
                                       //  _memories(screenSize, user),
                                     ],
                                   ),
@@ -461,7 +516,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             return Row(
               mainAxisAlignment: !isYourProfile
                   ? MainAxisAlignment.spaceAround
-                  : MainAxisAlignment.center,
+                  : MainAxisAlignment.start,
               children: !isYourProfile && widget.user != null
                   ? [
                       SizedBox(
@@ -474,12 +529,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         width: 100,
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.yellow, width: 3),
-                          borderRadius: BorderRadius.circular(15),
+                          borderRadius: BorderRadius.circular(50),
                         ),
                         child: user.avatarUrl != null &&
                                 user.avatarUrl!.isNotEmpty
                             ? ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(50),
                                 child: Image.network(
                                   user.avatarUrl!,
                                   loadingBuilder:
@@ -492,7 +547,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   fit: BoxFit.cover,
                                 ))
                             : ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(50),
                                 child: Image.asset(
                                   "./assets/avatar.png",
                                   errorBuilder: (context, error, stackTrace) =>
@@ -555,14 +610,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Container(
                         height: 100,
                         width: 100,
-                        decoration: BoxDecoration(
+                        /*decoration: BoxDecoration(
                           border: Border.all(color: Colors.yellow, width: 3),
-                          borderRadius: BorderRadius.circular(15),
-                        ),
+                          borderRadius: BorderRadius.circular(50),
+                        ),*/
+                        margin: const EdgeInsets.only(left: 20),
                         child: user.avatarUrl != null &&
                                 user.avatarUrl!.isNotEmpty
                             ? ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(50),
                                 child: Image.network(
                                   user.avatarUrl!,
                                   loadingBuilder:
@@ -576,7 +632,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                               )
                             : ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(50),
                                 child: Image.asset(
                                   "./assets/avatar.png",
                                   errorBuilder: (context, error, stackTrace) =>
@@ -629,14 +685,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _infoCard(screenSize, ValueNotifier<User> notifier) {
     return Container(
-      height: 65,
-      width: screenSize.width * 0.85,
-      margin: const EdgeInsets.only(top: 30),
-      padding: const EdgeInsets.only(right: 20),
+      height: 55,
+      width: screenSize.width * 0.6,
+      margin: const EdgeInsets.only(top: 10, left: 20),
+      padding: const EdgeInsets.only(right: 5),
       decoration: BoxDecoration(
         color: secondaryColor,
         border: Border.all(color: whiteColor, width: 1),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,

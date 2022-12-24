@@ -6,7 +6,6 @@ import 'package:flemis/mobile/ui/screens/chat/chat_list_screen.dart';
 import 'package:flemis/mobile/ui/screens/explore/explore_screen.dart';
 import 'package:flemis/mobile/ui/screens/flemis/flemis_screen.dart';
 import 'package:flemis/mobile/ui/screens/home/mobile_home.dart';
-import 'package:flemis/mobile/ui/screens/policy/privacy_policy_screen.dart';
 import 'package:flemis/mobile/ui/screens/profile/profile_screen.dart';
 import 'package:flemis/mobile/utils/navigator.dart';
 import 'package:flutter/cupertino.dart';
@@ -16,7 +15,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
 import '../../../models/user.dart';
-import '../camera/camera_screen.dart';
 
 class MobileBase extends StatefulWidget {
   const MobileBase({Key? key, this.user}) : super(key: key);
@@ -60,6 +58,10 @@ class _MobileBaseState extends State<MobileBase> {
       extendBodyBehindAppBar: true,
       resizeToAvoidBottomInset: true,
       body: PageView(
+        physics:
+            manager!.currentPage.value == 0 || manager!.currentPage.value == 4
+                ? null
+                : const NeverScrollableScrollPhysics(),
         controller: pageController,
         children: screens!,
         onPageChanged: (value) => manager!.setCurrentPage(value),
@@ -189,7 +191,8 @@ class _MobileBaseState extends State<MobileBase> {
                           color: secondaryColor,
                           size: 30,
                         ),
-                        label: ""),                    BottomNavigationBarItem(
+                        label: ""),
+                    BottomNavigationBarItem(
                         icon: Icon(
                           FontAwesomeIcons.house,
                           color: whiteColor,
