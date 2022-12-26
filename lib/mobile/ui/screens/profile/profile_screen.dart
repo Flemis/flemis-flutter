@@ -368,7 +368,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 backgroundCover(screenSize, user),
                                 backgroundCoverGradient(screenSize),
                                 Container(
-                                  height: screenSize.height * .6,
+                                  height: screenSize.height >= 730
+                                      ? screenSize.height * .55
+                                      : screenSize.height * 0.6,
                                   alignment: Alignment.center,
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -376,6 +378,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
                                         children: [
                                           _avatarWidget(
                                               context,
@@ -459,16 +463,144 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         )
                                       else
                                         Container(
-                                          padding:
-                                              const EdgeInsets.only(top: 10),
-                                          child: Text(
-                                            user.bio != null
-                                                ? user.bio!
-                                                : user.id!,
-                                            style: secondaryFontStyle[3],
+                                          padding: const EdgeInsets.only(
+                                              top: 0, left: 20),
+                                          child: Column(
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                    user.username!,
+                                                    style:
+                                                        secondaryFontStyle[2],
+                                                  ),
+                                                  ValueListenableBuilder<User>(
+                                                      valueListenable:
+                                                          notifierUser,
+                                                      builder:
+                                                          (context, _, __) {
+                                                        return Container(
+                                                          width:
+                                                              screenSize.width *
+                                                                  0.35,
+                                                          padding: user.followers ==
+                                                                      null ||
+                                                                  !user.followers!.any((element) =>
+                                                                      element ==
+                                                                      manager!
+                                                                          .user!
+                                                                          .id!)
+                                                              ? const EdgeInsets
+                                                                      .only(
+                                                                  left: 15,
+                                                                  right: 15.0,
+                                                                  top: 5)
+                                                              : const EdgeInsets
+                                                                      .only(
+                                                                  left: 15,
+                                                                  right: 10.0,
+                                                                  top: 5),
+                                                          child: ElevatedButton(
+                                                            style: ElevatedButton
+                                                                .styleFrom(
+                                                                    shape:
+                                                                        RoundedRectangleBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              10),
+                                                                      side: const BorderSide(
+                                                                          color: Colors
+                                                                              .white,
+                                                                          width:
+                                                                              1),
+                                                                    ),
+                                                                    backgroundColor: user.followers ==
+                                                                                null ||
+                                                                            !user.followers!.any((element) =>
+                                                                                element ==
+                                                                                manager!
+                                                                                    .user!.id!)
+                                                                        ? Colors
+                                                                            .transparent
+                                                                        : Colors
+                                                                            .transparent,
+                                                                    foregroundColor: user.followers ==
+                                                                                null ||
+                                                                            !user.followers!.any((element) =>
+                                                                                element == manager!.user!.id!)
+                                                                        ? secondaryColor
+                                                                        : Colors.red),
+                                                            onPressed: user.followers ==
+                                                                        null ||
+                                                                    !user.followers!.any((element) =>
+                                                                        element ==
+                                                                        manager!
+                                                                            .user!
+                                                                            .id!)
+                                                                ? () async {
+                                                                    notifierUser
+                                                                        .value
+                                                                        .followers
+                                                                        ?.add(manager!
+                                                                            .user!
+                                                                            .id!);
+                                                                    notifierUser
+                                                                        .notifyListeners();
+                                                                    manager
+                                                                        ?.user!
+                                                                        .following
+                                                                        ?.add(user
+                                                                            .id!);
+                                                                    await _repository
+                                                                        .updateUserLocally(
+                                                                            manager!.user!);
+                                                                    await _userController?.followUser(
+                                                                        manager!
+                                                                            .user!,
+                                                                        user.id!);
+                                                                  }
+                                                                : () async {
+                                                                    notifierUser
+                                                                        .value
+                                                                        .followers
+                                                                        ?.removeWhere((element) =>
+                                                                            element ==
+                                                                            manager?.user!.id);
+                                                                    notifierUser
+                                                                        .notifyListeners();
+                                                                    manager
+                                                                        ?.user!
+                                                                        .following
+                                                                        ?.removeWhere((element) =>
+                                                                            element ==
+                                                                            user.id!);
+                                                                    await _repository
+                                                                        .updateUserLocally(
+                                                                            manager!.user!);
+                                                                    await _userController?.unfollowUser(
+                                                                        manager!
+                                                                            .user!,
+                                                                        user.id!);
+                                                                  },
+                                                            child: user.followers ==
+                                                                        null ||
+                                                                    !user.followers!.any((element) =>
+                                                                        element ==
+                                                                        manager!
+                                                                            .user!
+                                                                            .id!)
+                                                                ? const Text(
+                                                                    "Follow")
+                                                                : const Text(
+                                                                    "Unfollow"),
+                                                          ),
+                                                        );
+                                                      }),
+                                                ],
+                                              )
+                                            ],
                                           ),
                                         ),
-
                                       //  _memories(screenSize, user),
                                     ],
                                   ),
@@ -515,14 +647,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
           builder: (context, user, _) {
             return Row(
               mainAxisAlignment: !isYourProfile
-                  ? MainAxisAlignment.spaceAround
+                  ? MainAxisAlignment.start
                   : MainAxisAlignment.start,
               children: !isYourProfile && widget.user != null
                   ? [
                       SizedBox(
                         width: screenSize.width >= 400
-                            ? screenSize.width * 0.22
-                            : screenSize.width * 0.25,
+                            ? screenSize.width * 0.05
+                            : screenSize.width * 0.02,
                       ),
                       Container(
                         height: 100,
@@ -555,56 +687,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   fit: BoxFit.cover,
                                 )),
                       ),
-                      Padding(
-                        padding: user.followers == null ||
-                                !user.followers!.any(
-                                    (element) => element == manager!.user!.id!)
-                            ? const EdgeInsets.only(left: 0, right: 20.0)
-                            : const EdgeInsets.only(left: 5, right: 10.0),
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: user.followers == null ||
-                                      !user.followers!.any((element) =>
-                                          element == manager!.user!.id!)
-                                  ? secondaryColor
-                                  : primaryColor,
-                              foregroundColor: user.followers == null ||
-                                      !user.followers!.any((element) =>
-                                          element == manager!.user!.id!)
-                                  ? primaryColor
-                                  : Colors.red),
-                          onPressed: user.followers == null ||
-                                  !user.followers!.any((element) =>
-                                      element == manager!.user!.id!)
-                              ? () async {
-                                  notifier.value.followers
-                                      ?.add(manager!.user!.id!);
-                                  notifier.notifyListeners();
-                                  manager?.user!.following?.add(user.id!);
-                                  await _repository
-                                      .updateUserLocally(manager!.user!);
-                                  await _userController?.followUser(
-                                      manager!.user!, user.id!);
-                                }
-                              : () async {
-                                  notifier.value.followers?.removeWhere(
-                                      (element) =>
-                                          element == manager?.user!.id);
-                                  notifier.notifyListeners();
-                                  manager?.user!.following?.removeWhere(
-                                      (element) => element == user.id!);
-                                  await _repository
-                                      .updateUserLocally(manager!.user!);
-                                  await _userController?.unfollowUser(
-                                      manager!.user!, user.id!);
-                                },
-                          child: user.followers == null ||
-                                  !user.followers!.any((element) =>
-                                      element == manager!.user!.id!)
-                              ? const Text("Follow")
-                              : const Text("Unfollow"),
-                        ),
-                      )
                     ]
                   : [
                       Container(
@@ -687,7 +769,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Container(
       height: 55,
       width: screenSize.width * 0.6,
-      margin: const EdgeInsets.only(top: 10, left: 20),
+      margin: const EdgeInsets.only(top: 15, left: 20),
       padding: const EdgeInsets.only(right: 5),
       decoration: BoxDecoration(
         color: secondaryColor,
